@@ -5,7 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Program.fs" />
+    <Compile Include="Read.fs" />
+    <Compile Include="Postgres.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+    <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
   </ItemGroup>
 
 </Project>
