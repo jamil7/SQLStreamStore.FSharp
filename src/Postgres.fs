@@ -2,17 +2,17 @@ namespace SqlStreamStore.FSharp.Postgres
 
 open SqlStreamStore
 
-type Config =
+type PostgresConfig =
     { host: string
       port: string
       username: string
       password: string
       database: string }
 
-type PostgresStore = PostgresStreamStore
+type PostgresConnection = PostgresStreamStore
 
 module Postgres =
-    let createStore: Config -> PostgresStore =
+    let createStore: PostgresConfig -> PostgresConnection =
         fun config ->
 
             let storeSettings: string =
@@ -26,5 +26,5 @@ module Postgres =
 
             new PostgresStreamStore(PostgresStreamStoreSettings(storeSettings))
 
-    let createSchema: PostgresStore -> Async<unit> =
-        fun store -> store.CreateSchemaIfNotExists() |> Async.AwaitTask
+    let createSchema: PostgresConnection -> Async<unit> =
+        fun conn -> conn.CreateSchemaIfNotExists() |> Async.AwaitTask
