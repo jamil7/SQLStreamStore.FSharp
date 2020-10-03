@@ -1,21 +1,44 @@
 namespace SqlStreamStore.FSharp
 
+open System
 open SqlStreamStore
+open SqlStreamStore
+open SqlStreamStore.Streams
 open SqlStreamStore.Streams
 
 type NewMessage = NewStreamMessage
-type Message = StreamMessage
-type MessageDetails = {
-    id : Id 
-    event: string
-    body: string
-    metadata: string
-}
-and Id = Custom of System.Guid | Auto
+type Connection = IStreamStore
+type Position = int
+
+type StreamName = string
+
+type MessageDetails =
+    { id: Id
+      event: string
+      body: string
+      metadata: string }
+
+and Id =
+    | Custom of Guid
+    | Auto
 
 module append =
-        let appendMessage : MessageDetails -> unit  =
-            fun msg ->
-//                 let hi i = function | Custom guid -> guid | Auto -> System.Guid.NewGuid ()
-                    
-            failwith "hi"
+    let appendMessage: Connection-> StreamName -> Position-> MessageDetails -> Async<AppendResult> =
+        fun conn stream pos msg->
+            let id: Id -> Guid =
+                function
+                | Custom guid -> guid
+                | Auto -> Guid.NewGuid()
+
+            let createMessage: MessageDetails -> NewMessage =
+                fun msg ->
+                    match msg.metadata with
+                    | "" -> NewMessage(id msg.id, msg.event, msg.body)
+                    | metadata -> NewMessage(id msg.id, msg.event, msg.body, metadata)
+
+            let append : Connection-> StreamName -> Position-> MessageDetails-> Async<AppendResult> =
+                fun conn stream pos msg ->
+                    conn.AppendToStream (stream, pos, createMessage msg)
+                    |> Async.AwaitTask
+            
+            append conn stream pos msg
