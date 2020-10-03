@@ -1,4 +1,4 @@
-# SqlStreamStore.Fsharp
+# SqlStreamStore.FSharp
 
 A thin F# wrapper around SQLStreamStore, a stream store library for .NET that specifically targets SQL based implementations. Primarily used to implement Event Sourced applications. Written in C#.
 
