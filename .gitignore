@@ -5,8 +5,5 @@
 .ionide
 .DS_Store
 
-# Compiled code
-src/*/bin
-
-# Temp files created by the compiler
-src/*/obj
+src/bin
+src/obj
