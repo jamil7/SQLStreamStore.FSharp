@@ -2,8 +2,6 @@ namespace SqlStreamStore.FSharp
 
 open System
 open SqlStreamStore
-open SqlStreamStore
-open SqlStreamStore.Streams
 open SqlStreamStore.Streams
 
 type NewMessage = NewStreamMessage
