@@ -1,0 +1,12 @@
+.git/
+.idea/
+.vs
+.vscode
+.ionide
+.DS_Store
+
+# Compiled code
+src/*/bin
+
+# Temp files created by the compiler
+src/*/obj
