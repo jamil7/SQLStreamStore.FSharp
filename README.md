@@ -1,11 +1,10 @@
-# SqlStreamStore.Fsharp
+# SqlStreamStore.FSharp
 
 A thin F# wrapper around [SQLStreamStore](https://www.nuget.org/packages/SqlStreamStore), and [SqlStreamStore.Postgres](https://www.nuget.org/packages/SqlStreamStore.Postgres).
 
 ## Supported functionality
 - Connecting to Postgres
 - TODO
-
 
 ## TODO
 
