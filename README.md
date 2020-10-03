@@ -1,1 +1,1 @@
-# fsss
+# SqlStreamStore.Fsharp
