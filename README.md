@@ -1,8 +1,11 @@
 # SqlStreamStore.Fsharp
 
-A thin F# wrapper around SQLStreamStore, the stream store library for .NET that specifically targets SQL based implementations. Primarily used to implement Event Sourced applications.
+A thin F# wrapper around [SQLStreamStore](https://www.nuget.org/packages/SqlStreamStore), and [SqlStreamStore.Postgres](https://www.nuget.org/packages/SqlStreamStore.Postgres).
 
-https://github.com/SQLStreamStore/SQLStreamStore
+## Supported functionality
+- Connecting to Postgres
+- TODO
+
 
 ## TODO
 
