@@ -16,7 +16,7 @@ and Id =
 
 module append =
     let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
-        fun store stream msg ->
+        fun store streamDetails messageDetails ->
             let id: Id -> Guid =
                 function
                 | Custom guid -> guid
@@ -33,4 +33,4 @@ module append =
                     store.AppendToStream(stream.streamName, stream.position, createMessage msg)
                     |> Async.AwaitTask
 
-            append store stream msg
+            append store streamDetails messageDetails
