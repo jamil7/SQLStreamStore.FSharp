@@ -11,11 +11,12 @@ For more complete implementations check out other libraries such as [Equinox](ht
 
 ## Supported functionality
 - Connecting to Postgres
-- TODO
+- Reading a `StreamMessage`
+- Appending a `StreamMessage`
 
 ## TODO
 
 - ~~Postgres connector~~
-- Read a stream message
-- Write a stream message
+- ~~Read a stream message~~
+- ~~Write a stream message~~
 - Subscribe to a stream
