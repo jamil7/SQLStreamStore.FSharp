@@ -9,10 +9,8 @@ type PostgresConfig =
       password: string
       database: string }
 
-type PostgresConnection = PostgresStreamStore
-
 module Postgres =
-    let createStore: PostgresConfig -> PostgresConnection =
+    let createStore: PostgresConfig -> PostgresStreamStore =
         fun config ->
 
             let storeSettings: string =
@@ -26,5 +24,5 @@ module Postgres =
 
             new PostgresStreamStore(PostgresStreamStoreSettings(storeSettings))
 
-    let createSchema: PostgresConnection -> Async<unit> =
+    let createSchema: PostgresStreamStore -> Async<unit> =
         fun conn -> conn.CreateSchemaIfNotExists() |> Async.AwaitTask
