@@ -33,4 +33,4 @@ module ReadExtras =
             |> fun messageList ->
                 if messageList.Length = msgCount
                 then Ok messageList
-                else Error "Failed to retrieve some or all messages."
+                else Error(sprintf "Failed to retrieve all messages. Messages retrieved count: %d" messageList.Length)
