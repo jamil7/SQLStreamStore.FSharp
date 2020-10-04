@@ -10,20 +10,31 @@ type ReadingDirection =
     | Backward
 
 module Read =
+    let toStartPosition: int option -> int =
+        function
+        | Some position -> position
+        | None -> 0
+
     let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> int -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount ->
             match readingDirection with
-            | Forward -> store.ReadStreamForwards(streamDetails.streamName, streamDetails.position, msgCount)
-            | Backward -> store.ReadStreamBackwards(streamDetails.streamName, streamDetails.position, msgCount)
+            | Forward ->
+                store.ReadStreamForwards
+                    (streamDetails.streamName, toStartPosition streamDetails.startPosition, msgCount)
+            | Backward ->
+                store.ReadStreamBackwards
+                    (streamDetails.streamName, toStartPosition streamDetails.startPosition, msgCount)
             |> Async.AwaitTask
 
     let readFromStreamAsync': IStreamStore -> ReadingDirection -> StreamDetails -> int -> CancellationToken -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount cancellationToken ->
             match readingDirection with
             | Forward ->
-                store.ReadStreamForwards(streamDetails.streamName, streamDetails.position, msgCount, cancellationToken)
+                store.ReadStreamForwards
+                    (streamDetails.streamName, toStartPosition streamDetails.startPosition, msgCount, cancellationToken)
             | Backward ->
-                store.ReadStreamBackwards(streamDetails.streamName, streamDetails.position, msgCount, cancellationToken)
+                store.ReadStreamBackwards
+                    (streamDetails.streamName, toStartPosition streamDetails.startPosition, msgCount, cancellationToken)
             |> Async.AwaitTask
 
 module ReadExtras =

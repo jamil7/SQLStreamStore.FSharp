@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open System
+
 open SqlStreamStore
 open SqlStreamStore.Streams
 
@@ -11,16 +11,16 @@ type MessageDetails =
       jsonMetadata: string }
 
 and Id =
-    | Custom of Guid
+    | Custom of System.Guid
     | Auto
 
 module append =
     let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store streamDetails messageDetails ->
-            let id: Id -> Guid =
+            let id: Id -> System.Guid =
                 function
                 | Custom guid -> guid
-                | Auto -> Guid.NewGuid()
+                | Auto -> System.Guid.NewGuid()
 
             let createMessage: MessageDetails -> NewStreamMessage =
                 fun msg ->
@@ -28,9 +28,17 @@ module append =
                     | "" -> NewStreamMessage(id msg.id, msg.type_, msg.jsonData)
                     | metadata -> NewStreamMessage(id msg.id, msg.type_, msg.jsonData, metadata)
 
+            let toVersion: Version -> int =
+                function
+                | Version.None
+                | Version.Any -> ExpectedVersion.Any
+                | Version.EmptyStream -> ExpectedVersion.EmptyStream
+                | Version.NoStream -> ExpectedVersion.NoStream
+                | Version.SpecificVersion version -> version
+
             let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
                 fun store stream msg ->
-                    store.AppendToStream(stream.streamName, stream.position, createMessage msg)
+                    store.AppendToStream(stream.streamName, toVersion stream.version, createMessage msg)
                     |> Async.AwaitTask
 
             append store streamDetails messageDetails

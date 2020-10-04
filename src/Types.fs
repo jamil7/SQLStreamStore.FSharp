@@ -1,3 +1,15 @@
 namespace SqlStreamStore.FSharp
 
-type StreamDetails = { streamName: string; position: int }
+
+[<RequireQualifiedAccessAttribute>]
+type Version =
+    | None
+    | Any
+    | EmptyStream
+    | NoStream
+    | SpecificVersion of int
+
+type StreamDetails =
+    { streamName: string
+      startPosition: int option
+      version: Version }
