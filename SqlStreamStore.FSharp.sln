@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SQLStreamStore.FSharp", "src\SQLStreamStore.FSharp.fsproj", "{22955019-D275-45AB-AD7C-B192BDB3F60F}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SqlStreamStore.FSharp", "src\SqlStreamStore.FSharp.fsproj", "{22955019-D275-45AB-AD7C-B192BDB3F60F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
