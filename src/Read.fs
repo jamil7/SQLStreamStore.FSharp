@@ -3,6 +3,7 @@
 open System.Threading
 open SqlStreamStore
 open SqlStreamStore.Streams
+open Insurello.AsyncExtra
 
 type ReadingDirection =
     | Forward
@@ -34,3 +35,17 @@ module ReadExtras =
                 if messageList.Length = msgCount
                 then Ok messageList
                 else Error(sprintf "Failed to retrieve all messages. Messages retrieved count: %d" messageList.Length)
+
+    let readStreamMessages': IStreamStore -> ReadingDirection -> StreamDetails -> int -> AsyncResult<List<StreamMessage>, string> =
+        fun store direction stream msgCount ->
+            Read.readFromStreamAsync store direction stream msgCount
+            |> Async.bind (fun readStreamPage ->
+                readStreamPage.Messages
+                |> Seq.toList
+                |> fun messageList ->
+                    if messageList.Length = msgCount then
+                        Ok messageList
+                    else
+                        Error
+                            (sprintf "Failed to retrieve all messages. Messages retrieved count: %d" messageList.Length)
+                |> AsyncResult.fromResult)
