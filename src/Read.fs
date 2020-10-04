@@ -49,5 +49,5 @@ module ReadExtras =
                         Ok messageList
                     else
                         Error
-                            (sprintf "Failed to retrieve all messages. Messages retrieved count: %d" messageList.Length)
+                            (sprintf "Failed to retrieve all messages. Retrieved messages count: %d" messageList.Length)
                 |> AsyncResult.fromResult)
