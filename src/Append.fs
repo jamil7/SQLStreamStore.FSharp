@@ -4,15 +4,11 @@ open System
 open SqlStreamStore
 open SqlStreamStore.Streams
 
-type NewMessage = NewStreamMessage
-type Connection = IStreamStore
-type Position = int
-
-type StreamName = string
+type StreamDetails = { streamName: string; position: int }
 
 type MessageDetails =
     { id: Id
-      event: string
+      type_: string
       body: string
       metadata: string }
 
@@ -21,22 +17,22 @@ and Id =
     | Auto
 
 module append =
-    let appendMessage: Connection-> StreamName -> Position-> MessageDetails -> Async<AppendResult> =
-        fun conn stream pos msg->
+    let appendMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+        fun store stream msg ->
             let id: Id -> Guid =
                 function
                 | Custom guid -> guid
                 | Auto -> Guid.NewGuid()
 
-            let createMessage: MessageDetails -> NewMessage =
+            let createMessage: MessageDetails -> NewStreamMessage =
                 fun msg ->
                     match msg.metadata with
-                    | "" -> NewMessage(id msg.id, msg.event, msg.body)
-                    | metadata -> NewMessage(id msg.id, msg.event, msg.body, metadata)
+                    | "" -> NewStreamMessage(id msg.id, msg.type_, msg.body)
+                    | metadata -> NewStreamMessage(id msg.id, msg.type_, msg.body, metadata)
 
-            let append : Connection-> StreamName -> Position-> MessageDetails-> Async<AppendResult> =
-                fun conn stream pos msg ->
-                    conn.AppendToStream (stream, pos, createMessage msg)
+            let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+                fun store stream msg ->
+                    store.AppendToStream(stream.streamName, stream.position, createMessage msg)
                     |> Async.AwaitTask
-            
-            append conn stream pos msg
+
+            append store stream msg
