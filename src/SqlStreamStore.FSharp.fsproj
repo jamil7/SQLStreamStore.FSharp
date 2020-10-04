@@ -5,9 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Types.fs" />
+    <Compile Include="Append.fs" />
     <Compile Include="Read.fs" />
     <Compile Include="Postgres.fs" />
-    <Compile Include="Append.fs" />
   </ItemGroup>
 
   <ItemGroup>

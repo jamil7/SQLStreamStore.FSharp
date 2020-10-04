@@ -4,8 +4,6 @@ open System
 open SqlStreamStore
 open SqlStreamStore.Streams
 
-type StreamDetails = { streamName: string; position: int }
-
 type MessageDetails =
     { id: Id
       type_: string
