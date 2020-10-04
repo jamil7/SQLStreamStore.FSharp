@@ -9,15 +9,15 @@ type StreamDetails = { streamName: string; position: int }
 type MessageDetails =
     { id: Id
       type_: string
-      body: string
-      metadata: string }
+      jsonData: string
+      jsonMetadata: string }
 
 and Id =
     | Custom of Guid
     | Auto
 
 module append =
-    let appendMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+    let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store stream msg ->
             let id: Id -> Guid =
                 function
@@ -26,9 +26,9 @@ module append =
 
             let createMessage: MessageDetails -> NewStreamMessage =
                 fun msg ->
-                    match msg.metadata with
-                    | "" -> NewStreamMessage(id msg.id, msg.type_, msg.body)
-                    | metadata -> NewStreamMessage(id msg.id, msg.type_, msg.body, metadata)
+                    match msg.jsonMetadata with
+                    | "" -> NewStreamMessage(id msg.id, msg.type_, msg.jsonData)
+                    | metadata -> NewStreamMessage(id msg.id, msg.type_, msg.jsonData, metadata)
 
             let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
                 fun store stream msg ->
