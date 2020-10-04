@@ -3,21 +3,14 @@
 open SqlStreamStore
 open SqlStreamStore.Streams
 
-type NewMessage = NewStreamMessage
-type Message = StreamMessage
-
 type ReadingDirection =
     | Forward
     | Backward
 
-type StreamName = string
-type StartPosition = int
-type MessageCount = int
-
 module Read =
-    let readFromStreamAsync: IStreamStore -> StreamName -> ReadingDirection -> StartPosition -> MessageCount -> Async<ReadStreamPage> =
-        fun conn stream direction startPos msgCount ->
+    let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> int -> Async<ReadStreamPage> =
+        fun conn direction stream msgCount ->
             match direction with
-            | Forward -> conn.ReadStreamForwards(stream, startPos, msgCount)
-            | Backward -> conn.ReadStreamBackwards(stream, startPos, msgCount)
+            | Forward -> conn.ReadStreamForwards(stream.streamName, stream.position, msgCount)
+            | Backward -> conn.ReadStreamBackwards(stream.streamName, stream.position, msgCount)
             |> Async.AwaitTask
