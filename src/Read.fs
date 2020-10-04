@@ -10,15 +10,27 @@ type ReadingDirection =
 
 module Read =
     let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> int -> Async<ReadStreamPage> =
-        fun conn direction stream msgCount ->
+        fun store direction stream msgCount ->
             match direction with
-            | Forward -> conn.ReadStreamForwards(stream.streamName, stream.position, msgCount)
-            | Backward -> conn.ReadStreamBackwards(stream.streamName, stream.position, msgCount)
+            | Forward -> store.ReadStreamForwards(stream.streamName, stream.position, msgCount)
+            | Backward -> store.ReadStreamBackwards(stream.streamName, stream.position, msgCount)
             |> Async.AwaitTask
 
     let readFromStreamAsync': IStreamStore -> ReadingDirection -> StreamDetails -> int -> CancellationToken -> Async<ReadStreamPage> =
-        fun conn direction stream msgCount cancellationToken ->
+        fun store direction stream msgCount cancellationToken ->
             match direction with
-            | Forward -> conn.ReadStreamForwards(stream.streamName, stream.position, msgCount, cancellationToken)
-            | Backward -> conn.ReadStreamBackwards(stream.streamName, stream.position, msgCount, cancellationToken)
+            | Forward -> store.ReadStreamForwards(stream.streamName, stream.position, msgCount, cancellationToken)
+            | Backward -> store.ReadStreamBackwards(stream.streamName, stream.position, msgCount, cancellationToken)
             |> Async.AwaitTask
+
+module ReadExtras =
+    let readStreamMessages: IStreamStore -> ReadingDirection -> StreamDetails -> int -> Result<List<StreamMessage>, string> =
+        fun store direction stream msgCount ->
+            Read.readFromStreamAsync store direction stream msgCount
+            |> Async.RunSynchronously
+            |> fun readStreamPage -> readStreamPage.Messages
+            |> Seq.toList
+            |> fun messageList ->
+                if messageList.Length = msgCount
+                then Ok messageList
+                else Error "Failed to retrieve some or all messages."
