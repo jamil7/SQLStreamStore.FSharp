@@ -13,6 +13,9 @@ type StreamDetails =
     { streamName: string
       version: Version }
 
+type StartPositionInclusive = int64
+type MessageCount = int
+
 module Helpers =
     let toVersion: Version -> int =
         function
