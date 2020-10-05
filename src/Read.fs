@@ -19,6 +19,13 @@ module Read =
             | Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount)
             |> Async.AwaitTask
 
+    let readFromAllStreamAsync': IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> CancellationToken -> Async<ReadAllPage> =
+        fun store readingDirection startPositionInclusive msgCount cancellationToken ->
+            match readingDirection with
+            | Forward -> store.ReadAllForwards(startPositionInclusive, msgCount, cancellationToken)
+            | Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount, cancellationToken)
+            |> Async.AwaitTask
+
     let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount ->
             match readingDirection with
