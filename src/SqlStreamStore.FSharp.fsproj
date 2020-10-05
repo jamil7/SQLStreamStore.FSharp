@@ -1,20 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <PackageId>SqlStreamStore.FSharp</PackageId>
+        <Authors>Jamil Maqdis Anton</Authors>
+        <PackageDescription>Thin F# wrapper around SQLStreamStore</PackageDescription>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/jamil7/SQLStreamStore.FSharp</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Types.fs" />
-    <Compile Include="Append.fs" />
-    <Compile Include="Read.fs" />
-    <Compile Include="Postgres.fs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Include="Types.fs"/>
+        <Compile Include="Append.fs"/>
+        <Compile Include="Read.fs"/>
+        <Compile Include="Postgres.fs"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Insurello.AsyncExtra" Version="1.1.0" />
-    <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
-    <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Update="FSharp.Core" Version="4.7.2"/>
+        <PackageReference Include="Insurello.AsyncExtra" Version="1.1.0"/>
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
+    </ItemGroup>
 
 </Project>
