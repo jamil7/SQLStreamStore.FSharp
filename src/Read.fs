@@ -5,6 +5,7 @@ open SqlStreamStore
 open SqlStreamStore.Streams
 open Insurello.AsyncExtra
 
+[<RequireQualifiedAccessAttribute>]
 type ReadingDirection =
     | Forward
     | Backward
