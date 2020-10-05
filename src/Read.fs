@@ -10,8 +10,6 @@ type ReadingDirection =
     | Backward
 
 module Read =
-    type StartPositionInclusive = int64
-
     let readFromAllStreamAsync: IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> Async<ReadAllPage> =
         fun store readingDirection startPositionInclusive msgCount ->
             match readingDirection with
