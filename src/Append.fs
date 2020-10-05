@@ -15,7 +15,7 @@ and Id =
     | Auto
 
 module append =
-    let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+    let appendNewMessage: IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store streamDetails messageDetails ->
             let toId: Id -> System.Guid =
                 function
@@ -30,13 +30,12 @@ module append =
 
             let toVersion: Version -> int =
                 function
-                | Version.None
                 | Version.Any -> ExpectedVersion.Any
                 | Version.EmptyStream -> ExpectedVersion.EmptyStream
                 | Version.NoStream -> ExpectedVersion.NoStream
                 | Version.SpecificVersion version -> version
 
-            let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+            let append: IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
                 fun store stream msg ->
                     store.AppendToStream(stream.streamName, toVersion stream.version, createMessage msg)
                     |> Async.AwaitTask

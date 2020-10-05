@@ -1,15 +1,16 @@
 namespace SqlStreamStore.FSharp
 
-
 [<RequireQualifiedAccessAttribute>]
 type Version =
-    | None
     | Any
     | EmptyStream
     | NoStream
     | SpecificVersion of int
 
-type StreamDetails =
+type AppendStreamDetails =
     { streamName: string
-      startPosition: int option
       version: Version }
+
+type ReadStreamDetails =
+    { streamName: string
+      startPosition: int }
