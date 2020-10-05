@@ -10,26 +10,28 @@ type ReadingDirection =
     | Backward
 
 module Read =
-    let readFromStreamAsync: IStreamStore -> ReadingDirection -> ReadStreamDetails -> int -> Async<ReadStreamPage> =
+    let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> int -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount ->
             match readingDirection with
-            | Forward -> store.ReadStreamForwards(streamDetails.streamName, streamDetails.startPosition, msgCount)
-            | Backward -> store.ReadStreamBackwards(streamDetails.streamName, streamDetails.startPosition, msgCount)
+            | Forward ->
+                store.ReadStreamForwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
+            | Backward ->
+                store.ReadStreamBackwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
             |> Async.AwaitTask
 
-    let readFromStreamAsync': IStreamStore -> ReadingDirection -> ReadStreamDetails -> int -> CancellationToken -> Async<ReadStreamPage> =
+    let readFromStreamAsync': IStreamStore -> ReadingDirection -> StreamDetails -> int -> CancellationToken -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount cancellationToken ->
             match readingDirection with
             | Forward ->
                 store.ReadStreamForwards
-                    (streamDetails.streamName, streamDetails.startPosition, msgCount, cancellationToken)
+                    (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
             | Backward ->
                 store.ReadStreamBackwards
-                    (streamDetails.streamName, streamDetails.startPosition, msgCount, cancellationToken)
+                    (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
             |> Async.AwaitTask
 
 module ReadExtras =
-    let readStreamMessages: IStreamStore -> ReadingDirection -> ReadStreamDetails -> int -> AsyncResult<List<StreamMessage>, string> =
+    let readStreamMessages: IStreamStore -> ReadingDirection -> StreamDetails -> int -> AsyncResult<List<StreamMessage>, string> =
         fun store readingDirection streamDetails msgCount ->
             Read.readFromStreamAsync store readingDirection streamDetails msgCount
             |> Async.bind (fun readStreamPage ->
