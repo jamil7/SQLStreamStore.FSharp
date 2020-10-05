@@ -13,10 +13,6 @@ type StreamDetails =
     { streamName: string
       version: Version }
 
-type AllStreamDetails =
-    { streamName: string
-      startPosition: int }
-
 module Helpers =
     let toVersion: Version -> int =
         function
