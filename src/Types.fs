@@ -16,6 +16,11 @@ type StreamDetails =
 type StartPositionInclusive = int64
 type MessageCount = int
 
+[<RequireQualifiedAccessAttribute>]
+type AppendException =
+    | WrongExpectedVersion of System.Exception
+    | Other of System.Exception
+
 module Helpers =
     let toVersion: Version -> int =
         function

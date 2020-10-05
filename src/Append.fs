@@ -1,7 +1,10 @@
 namespace SqlStreamStore.FSharp
 
 
+open System
+open Insurello.AsyncExtra
 open SqlStreamStore
+open SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 type MessageDetails =
@@ -30,7 +33,21 @@ module Append =
 
             let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
                 fun store streamDetails messageDetails ->
-                    store.AppendToStream(streamDetails.streamName, Helpers.toVersion streamDetails.version, createMessage messageDetails)
+                    store.AppendToStream
+                        (streamDetails.streamName, Helpers.toVersion streamDetails.version, createMessage messageDetails)
                     |> Async.AwaitTask
 
             append store streamDetails messageDetails
+
+module AppendExtras =
+    let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> AsyncResult<AppendResult, AppendException> =
+        fun store streamDetails messageDetails ->
+            Append.appendNewMessage store streamDetails messageDetails
+            |> Async.Catch
+            |> Async.map (function
+                | Choice1Of2 response -> Ok response
+                | Choice2Of2 exn ->
+                    Error
+                    <| match exn with
+                       | :? AggregateException as exn -> exn.InnerException |> AppendException.WrongExpectedVersion   
+                       | _ as exn -> exn |> AppendException.Other)          

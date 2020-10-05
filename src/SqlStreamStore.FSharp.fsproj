@@ -11,17 +11,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Types.fs"/>
-        <Compile Include="Append.fs"/>
-        <Compile Include="Read.fs"/>
-        <Compile Include="Postgres.fs"/>
+        <Compile Include="Types.fs" />
+        <Compile Include="Append.fs" />
+        <Compile Include="Read.fs" />
+        <Compile Include="Postgres.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="4.7.2"/>
-        <PackageReference Include="Insurello.AsyncExtra" Version="1.1.0"/>
-        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
-        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
+        <PackageReference Update="FSharp.Core" Version="4.7.2" />
+        <PackageReference Include="Insurello.AsyncExtra" Version="1.1.0" />
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
 
 </Project>
