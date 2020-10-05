@@ -14,7 +14,7 @@ and Id =
     | Custom of System.Guid
     | Auto
 
-module append =
+module Append =
     let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store streamDetails messageDetails ->
             let toId: Id -> System.Guid =
