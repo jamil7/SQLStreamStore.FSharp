@@ -14,33 +14,33 @@ module Read =
     let readFromAllStreamAsync: IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> Async<ReadAllPage> =
         fun store readingDirection startPositionInclusive msgCount ->
             match readingDirection with
-            | Forward -> store.ReadAllForwards(startPositionInclusive, msgCount)
-            | Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount)
+            | ReadingDirection.Forward -> store.ReadAllForwards(startPositionInclusive, msgCount)
+            | ReadingDirection.Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount)
             |> Async.AwaitTask
 
     let readFromAllStreamAsync': IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> CancellationToken -> Async<ReadAllPage> =
         fun store readingDirection startPositionInclusive msgCount cancellationToken ->
             match readingDirection with
-            | Forward -> store.ReadAllForwards(startPositionInclusive, msgCount, cancellationToken)
-            | Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount, cancellationToken)
+            | ReadingDirection.Forward -> store.ReadAllForwards(startPositionInclusive, msgCount, cancellationToken)
+            | ReadingDirection.Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount, cancellationToken)
             |> Async.AwaitTask
 
     let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount ->
             match readingDirection with
-            | Forward ->
+            | ReadingDirection.Forward ->
                 store.ReadStreamForwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
-            | Backward ->
+            | ReadingDirection.Backward ->
                 store.ReadStreamBackwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
             |> Async.AwaitTask
 
     let readFromStreamAsync': IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> CancellationToken -> Async<ReadStreamPage> =
         fun store readingDirection streamDetails msgCount cancellationToken ->
             match readingDirection with
-            | Forward ->
+            | ReadingDirection.Forward ->
                 store.ReadStreamForwards
                     (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
-            | Backward ->
+            | ReadingDirection.Backward ->
                 store.ReadStreamBackwards
                     (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
             |> Async.AwaitTask
