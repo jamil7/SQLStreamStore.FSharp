@@ -3,10 +3,10 @@ namespace SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 module Append =
-    let private stringIdToGuid: Id -> System.Guid =
+    let private stringIdToGuid: StreamMessageId -> System.Guid =
         function
-        | Custom guid -> guid
-        | Auto -> System.Guid.NewGuid()
+        | StreamMessageId.Custom guid -> guid
+        | StreamMessageId.Auto -> System.Guid.NewGuid()
 
     let private newStreamMessageFromMessageDetails: MessageDetails -> NewStreamMessage =
         fun msg ->
