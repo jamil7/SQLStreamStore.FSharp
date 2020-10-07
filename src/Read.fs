@@ -52,32 +52,3 @@ module Read =
                      prefetchJson,
                      cancellationToken)
             |> Async.AwaitTask
-
-module ReadExtras =
-    let readAllStreamMessages: SqlStreamStore.IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
-        fun store readingDirection startPositionInclusive msgCount ->
-            Read.readFromAllStreamAsync store readingDirection startPositionInclusive msgCount
-            |> Async.bind (fun readAllPage ->
-                readAllPage.Messages
-                |> Seq.toList
-                |> fun messageList ->
-                    if messageList.Length = msgCount then
-                        Ok messageList
-                    else
-                        Error
-                            (sprintf "Failed to retrieve all messages. Retrieved messages count: %d" messageList.Length)
-                |> AsyncResult.fromResult)
-
-    let readStreamMessages: SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
-        fun store readingDirection readStreamDetails msgCount ->
-            Read.readFromStreamAsync store readingDirection readStreamDetails msgCount
-            |> Async.bind (fun readStreamPage ->
-                readStreamPage.Messages
-                |> Seq.toList
-                |> fun messageList ->
-                    if messageList.Length = msgCount then
-                        Ok messageList
-                    else
-                        Error
-                            (sprintf "Failed to retrieve all messages. Retrieved messages count: %d" messageList.Length)
-                |> AsyncResult.fromResult)

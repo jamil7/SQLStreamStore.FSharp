@@ -22,7 +22,7 @@ module Append =
         | AppendVersion.EmptyStream -> SqlStreamStore.Streams.ExpectedVersion.EmptyStream
         | AppendVersion.NoStream -> SqlStreamStore.Streams.ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
-    
+
     let appendNewMessage: SqlStreamStore.IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store streamDetails messageDetails ->
             store.AppendToStream
@@ -40,19 +40,3 @@ module Append =
                  |> List.map newStreamMessageFromMessageDetails
                  |> List.toArray)
             |> Async.AwaitTask
-
-module AppendExtras =
-    let appendNewMessage: SqlStreamStore.IStreamStore -> AppendStreamDetails -> MessageDetails -> AsyncResult<AppendResult, AppendException> =
-        fun store streamDetails messageDetails ->
-            Append.appendNewMessage store streamDetails messageDetails
-            |> Async.Catch
-            |> Async.map (function
-                | Choice1Of2 response -> Ok response
-                | Choice2Of2 exn ->
-                    Error
-                    <| match exn with
-                       // TODO: make sense
-                       | :? System.AggregateException as exn ->
-                           exn.InnerException
-                           |> AppendException.WrongExpectedVersion
-                       | exn -> exn |> AppendException.Other)
