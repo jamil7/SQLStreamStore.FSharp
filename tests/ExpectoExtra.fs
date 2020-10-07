@@ -1,7 +1,9 @@
+namespace SqlStreamStore.FSharp.Tests
+
 open Expecto
 
-/// Remove the need for message in expectations, as recommended https://github.com/haf/expecto/issues/361
-module Expect =
+module ExpectExtra =
+    /// Remove the need for message in expectations, as recommended https://github.com/haf/expecto/issues/361
 
     let inline equal e a = Expect.equal a e "Failed"
 
