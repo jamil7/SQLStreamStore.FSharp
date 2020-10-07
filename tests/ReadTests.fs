@@ -12,9 +12,9 @@ let tests =
         [ testAsync "Should read forward from specific stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
-              let appendStreamDetails: AppendStreamDetails =
-                  { streamName = "test"
-                    version = AppendVersion.NoStream }
+              let streamName = "test"
+              
+              let appendVersion = AppendVersion.NoStream
 
               let guidString1 = "11111111-1111-1111-1111-111111111111"
 
@@ -34,12 +34,12 @@ let tests =
 
               let msgList = [ msg1; msg2 ]
 
-              do! Append.appendNewMessages inMemStore appendStreamDetails msgList
+              do! Append.appendNewMessages inMemStore streamName appendVersion msgList
                   |> Async.Ignore
 
-              let readStreamDetails: ReadStreamDetails = { streamName = "test"; version = 0u }
+              let  readVersion = 0u 
 
-              let! readResult = Read.readFromStreamAsync inMemStore ReadingDirection.Forward readStreamDetails 10
+              let! readResult = Read.readFromStreamAsync inMemStore ReadingDirection.Forward streamName readVersion 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)

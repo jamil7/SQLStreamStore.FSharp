@@ -12,9 +12,9 @@ let tests =
         [ testAsync "Should append one message to stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
-              let appendStream: AppendStreamDetails =
-                  { streamName = "test"
-                    version = AppendVersion.NoStream }
+              let streamName = "test"
+              
+              let appendVersion = AppendVersion.NoStream
 
               let msg =
                   { id = StreamMessageId.Auto
@@ -22,7 +22,7 @@ let tests =
                     jsonData = "{}"
                     jsonMetadata = "{}" }
 
-              let! appendResult = Append.appendNewMessage inMemStore appendStream msg
+              let! appendResult = Append.appendNewMessage inMemStore streamName appendVersion msg
 
               ExpectExtra.equal 0 appendResult.CurrentVersion
           }
@@ -30,9 +30,9 @@ let tests =
           testAsync "Should append a list of messages to stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
-              let appendStream: AppendStreamDetails =
-                  { streamName = "test"
-                    version = AppendVersion.NoStream }
+              let streamName = "test"
+              
+              let appendVersion = AppendVersion.NoStream
 
               let msg1 =
                   { id = StreamMessageId.Auto
@@ -48,6 +48,6 @@ let tests =
 
               let msgList = [ msg1; msg2 ]
 
-              let! appendResult = Append.appendNewMessages inMemStore appendStream msgList
+              let! appendResult = Append.appendNewMessages inMemStore streamName appendVersion msgList
               ExpectExtra.equal 1 appendResult.CurrentVersion
           } ]
