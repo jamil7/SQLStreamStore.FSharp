@@ -9,6 +9,7 @@
     <ItemGroup>
         <Compile Include="ExpectoExtra.fs" />
         <Compile Include="AppendTests.fs" />
+        <Compile Include="ReadTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 
