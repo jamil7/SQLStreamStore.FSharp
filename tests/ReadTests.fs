@@ -3,7 +3,6 @@ module SqlStreamStore.FSharp.Tests.ReadTests
 open Expecto
 open SqlStreamStore.FSharp
 open SqlStreamStore.FSharp.Tests
-open SqlStreamStore.Streams
 
 
 [<Tests>]
