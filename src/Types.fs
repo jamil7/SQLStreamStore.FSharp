@@ -1,14 +1,16 @@
 namespace SqlStreamStore.FSharp
 
+[<RequireQualifiedAccessAttribute>]
+type StreamMessageId =
+    | Custom of System.Guid
+    | Auto
+
 type MessageDetails =
-    { id: Id
+    { id: StreamMessageId
       type_: string
       jsonData: string
       jsonMetadata: string }
 
-and Id =
-    | Custom of System.Guid
-    | Auto
 
 [<RequireQualifiedAccessAttribute>]
 type AppendVersion =
