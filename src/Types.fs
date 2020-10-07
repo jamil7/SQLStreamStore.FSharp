@@ -1,17 +1,21 @@
 namespace SqlStreamStore.FSharp
 
-open SqlStreamStore.Streams
-
 [<RequireQualifiedAccessAttribute>]
-type Version =
+type AppendVersion =
     | Any
     | EmptyStream
     | NoStream
     | SpecificVersion of int
 
-type StreamDetails =
+type AppendStreamDetails =
     { streamName: string
-      version: Version }
+      version: AppendVersion }
+
+type ReadStreamDetails =
+    { streamName: string
+      version: ReadVersion }
+
+and ReadVersion = uint
 
 type StartPositionInclusive = int64
 type MessageCount = int
@@ -22,9 +26,9 @@ type AppendException =
     | Other of System.Exception
 
 module Helpers =
-    let toVersion: Version -> int =
+    let getVersion: AppendVersion -> int =
         function
-        | Version.Any -> ExpectedVersion.Any
-        | Version.EmptyStream -> ExpectedVersion.EmptyStream
-        | Version.NoStream -> ExpectedVersion.NoStream
-        | Version.SpecificVersion version -> version
+        | AppendVersion.Any -> SqlStreamStore.Streams.ExpectedVersion.Any
+        | AppendVersion.EmptyStream -> SqlStreamStore.Streams.ExpectedVersion.EmptyStream
+        | AppendVersion.NoStream -> SqlStreamStore.Streams.ExpectedVersion.NoStream
+        | AppendVersion.SpecificVersion version -> version
