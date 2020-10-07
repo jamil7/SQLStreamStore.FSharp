@@ -1,5 +1,15 @@
 namespace SqlStreamStore.FSharp
 
+type MessageDetails =
+    { id: Id
+      type_: string
+      jsonData: string
+      jsonMetadata: string }
+
+and Id =
+    | Custom of System.Guid
+    | Auto
+
 [<RequireQualifiedAccessAttribute>]
 type AppendVersion =
     | Any
@@ -25,10 +35,7 @@ type AppendException =
     | WrongExpectedVersion of System.Exception
     | Other of System.Exception
 
-module Helpers =
-    let getVersion: AppendVersion -> int =
-        function
-        | AppendVersion.Any -> SqlStreamStore.Streams.ExpectedVersion.Any
-        | AppendVersion.EmptyStream -> SqlStreamStore.Streams.ExpectedVersion.EmptyStream
-        | AppendVersion.NoStream -> SqlStreamStore.Streams.ExpectedVersion.NoStream
-        | AppendVersion.SpecificVersion version -> version
+[<RequireQualifiedAccessAttribute>]
+type ReadingDirection =
+    | Forward
+    | Backward
