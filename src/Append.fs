@@ -1,10 +1,8 @@
 namespace SqlStreamStore.FSharp
 
 
-open System
 open Insurello.AsyncExtra
 open SqlStreamStore
-open SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 type MessageDetails =
@@ -18,29 +16,37 @@ and Id =
     | Auto
 
 module Append =
-    let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
+    let private stringIdToGuid: Id -> System.Guid =
+        function
+        | Custom guid -> guid
+        | Auto -> System.Guid.NewGuid()
+
+    let private newStreamMessageFromMessageDetails: MessageDetails -> NewStreamMessage =
+        fun msg ->
+            match msg.jsonMetadata with
+            | "" -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData)
+            | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData, metadata)
+
+    let appendNewMessage: IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
         fun store streamDetails messageDetails ->
-            let toId: Id -> System.Guid =
-                function
-                | Custom guid -> guid
-                | Auto -> System.Guid.NewGuid()
+            store.AppendToStream
+                (StreamId(streamDetails.streamName),
+                 Helpers.getVersion streamDetails.version,
+                 [| newStreamMessageFromMessageDetails messageDetails |])
+            |> Async.AwaitTask
 
-            let createMessage: MessageDetails -> NewStreamMessage =
-                fun msg ->
-                    match msg.jsonMetadata with
-                    | "" -> NewStreamMessage(toId msg.id, msg.type_, msg.jsonData)
-                    | metadata -> NewStreamMessage(toId msg.id, msg.type_, msg.jsonData, metadata)
-
-            let append: IStreamStore -> StreamDetails -> MessageDetails -> Async<AppendResult> =
-                fun store streamDetails messageDetails ->
-                    store.AppendToStream
-                        (streamDetails.streamName, Helpers.toVersion streamDetails.version, createMessage messageDetails)
-                    |> Async.AwaitTask
-
-            append store streamDetails messageDetails
+    let appendNewMessages: IStreamStore -> AppendStreamDetails -> List<MessageDetails> -> Async<AppendResult> =
+        fun store streamDetails messages ->
+            store.AppendToStream
+                (StreamId(streamDetails.streamName),
+                 Helpers.getVersion streamDetails.version,
+                 messages
+                 |> List.map newStreamMessageFromMessageDetails
+                 |> List.toArray)
+            |> Async.AwaitTask
 
 module AppendExtras =
-    let appendNewMessage: IStreamStore -> StreamDetails -> MessageDetails -> AsyncResult<AppendResult, AppendException> =
+    let appendNewMessage: IStreamStore -> AppendStreamDetails -> MessageDetails -> AsyncResult<AppendResult, AppendException> =
         fun store streamDetails messageDetails ->
             Append.appendNewMessage store streamDetails messageDetails
             |> Async.Catch
@@ -49,5 +55,8 @@ module AppendExtras =
                 | Choice2Of2 exn ->
                     Error
                     <| match exn with
-                       | :? AggregateException as exn -> exn.InnerException |> AppendException.WrongExpectedVersion   
-                       | _ as exn -> exn |> AppendException.Other)          
+                       // TODO: make sense
+                       | :? System.AggregateException as exn ->
+                           exn.InnerException
+                           |> AppendException.WrongExpectedVersion
+                       | exn -> exn |> AppendException.Other)
