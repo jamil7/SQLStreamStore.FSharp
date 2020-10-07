@@ -1,52 +1,60 @@
 ﻿namespace SqlStreamStore.FSharp
 
 open System.Threading
-open SqlStreamStore
 open SqlStreamStore.Streams
 open Insurello.AsyncExtra
 
-[<RequireQualifiedAccessAttribute>]
-type ReadingDirection =
-    | Forward
-    | Backward
-
 module Read =
-    let readFromAllStreamAsync: IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> Async<ReadAllPage> =
+    let private fromReadVersion: uint -> int = fun readVersion -> int (readVersion)
+
+    let readFromAllStreamAsync: SqlStreamStore.IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> Async<ReadAllPage> =
         fun store readingDirection startPositionInclusive msgCount ->
             match readingDirection with
             | ReadingDirection.Forward -> store.ReadAllForwards(startPositionInclusive, msgCount)
             | ReadingDirection.Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount)
             |> Async.AwaitTask
 
-    let readFromAllStreamAsync': IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> CancellationToken -> Async<ReadAllPage> =
-        fun store readingDirection startPositionInclusive msgCount cancellationToken ->
-            match readingDirection with
-            | ReadingDirection.Forward -> store.ReadAllForwards(startPositionInclusive, msgCount, cancellationToken)
-            | ReadingDirection.Backward -> store.ReadAllBackwards(startPositionInclusive, msgCount, cancellationToken)
-            |> Async.AwaitTask
-
-    let readFromStreamAsync: IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> Async<ReadStreamPage> =
-        fun store readingDirection streamDetails msgCount ->
+    let readFromAllStreamAsync': SqlStreamStore.IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> bool -> CancellationToken -> Async<ReadAllPage> =
+        fun store readingDirection startPositionInclusive msgCount prefetchJson cancellationToken ->
             match readingDirection with
             | ReadingDirection.Forward ->
-                store.ReadStreamForwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
+                store.ReadAllForwards(startPositionInclusive, msgCount, prefetchJson, cancellationToken)
             | ReadingDirection.Backward ->
-                store.ReadStreamBackwards(streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount)
+                store.ReadAllBackwards(startPositionInclusive, msgCount, prefetchJson, cancellationToken)
             |> Async.AwaitTask
 
-    let readFromStreamAsync': IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> CancellationToken -> Async<ReadStreamPage> =
-        fun store readingDirection streamDetails msgCount cancellationToken ->
+    let readFromStreamAsync: SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> Async<ReadStreamPage> =
+        fun store readingDirection readStreamDetails msgCount ->
             match readingDirection with
             | ReadingDirection.Forward ->
                 store.ReadStreamForwards
-                    (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
+                    (StreamId(readStreamDetails.streamName), fromReadVersion readStreamDetails.version, msgCount)
             | ReadingDirection.Backward ->
                 store.ReadStreamBackwards
-                    (streamDetails.streamName, Helpers.toVersion streamDetails.version, msgCount, cancellationToken)
+                    (StreamId(readStreamDetails.streamName), fromReadVersion readStreamDetails.version, msgCount)
+            |> Async.AwaitTask
+
+    let readFromStreamAsync': SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> bool -> CancellationToken -> Async<ReadStreamPage> =
+        fun store readingDirection readStreamDetails msgCount prefetchJson cancellationToken ->
+            match readingDirection with
+            | ReadingDirection.Forward ->
+                store.ReadStreamForwards
+                    (StreamId(readStreamDetails.streamName),
+                     fromReadVersion readStreamDetails.version,
+                     msgCount,
+                     prefetchJson,
+                     cancellationToken)
+            | ReadingDirection.Backward ->
+                store.ReadStreamBackwards
+                    (StreamId(readStreamDetails.streamName),
+                     fromReadVersion readStreamDetails.version,
+                     msgCount,
+                     prefetchJson,
+                     cancellationToken)
             |> Async.AwaitTask
 
 module ReadExtras =
-    let readAllStreamMessages: IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
+    let readAllStreamMessages: SqlStreamStore.IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
         fun store readingDirection startPositionInclusive msgCount ->
             Read.readFromAllStreamAsync store readingDirection startPositionInclusive msgCount
             |> Async.bind (fun readAllPage ->
@@ -60,9 +68,9 @@ module ReadExtras =
                             (sprintf "Failed to retrieve all messages. Retrieved messages count: %d" messageList.Length)
                 |> AsyncResult.fromResult)
 
-    let readStreamMessages: IStreamStore -> ReadingDirection -> StreamDetails -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
-        fun store readingDirection streamDetails msgCount ->
-            Read.readFromStreamAsync store readingDirection streamDetails msgCount
+    let readStreamMessages: SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> AsyncResult<List<StreamMessage>, string> =
+        fun store readingDirection readStreamDetails msgCount ->
+            Read.readFromStreamAsync store readingDirection readStreamDetails msgCount
             |> Async.bind (fun readStreamPage ->
                 readStreamPage.Messages
                 |> Seq.toList
