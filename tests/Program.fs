@@ -1,6 +1,4 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open Expecto
+﻿open Expecto
 
 [<EntryPoint>]
 let main args =
