@@ -2,7 +2,6 @@
 
 open System.Threading
 open SqlStreamStore.Streams
-open Insurello.AsyncExtra
 
 module Read =
     let private fromReadVersion: uint -> int = fun readVersion -> int (readVersion)

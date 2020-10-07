@@ -1,7 +1,5 @@
 namespace SqlStreamStore.FSharp
 
-
-open Insurello.AsyncExtra
 open SqlStreamStore.Streams
 
 module Append =
@@ -18,9 +16,9 @@ module Append =
 
     let private fromAppendVersion: AppendVersion -> int =
         function
-        | AppendVersion.Any -> SqlStreamStore.Streams.ExpectedVersion.Any
-        | AppendVersion.EmptyStream -> SqlStreamStore.Streams.ExpectedVersion.EmptyStream
-        | AppendVersion.NoStream -> SqlStreamStore.Streams.ExpectedVersion.NoStream
+        | AppendVersion.Any -> ExpectedVersion.Any
+        | AppendVersion.EmptyStream -> ExpectedVersion.EmptyStream
+        | AppendVersion.NoStream -> ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
 
     let appendNewMessage: SqlStreamStore.IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
