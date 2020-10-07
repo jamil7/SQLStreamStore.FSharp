@@ -1,5 +1,6 @@
 namespace SqlStreamStore.FSharp
 
+open SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 module Append =
@@ -21,19 +22,19 @@ module Append =
         | AppendVersion.NoStream -> ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
 
-    let appendNewMessage: SqlStreamStore.IStreamStore -> AppendStreamDetails -> MessageDetails -> Async<AppendResult> =
-        fun store streamDetails messageDetails ->
+    let appendNewMessage: SqlStreamStore.IStreamStore -> StreamName -> AppendVersion -> MessageDetails -> Async<AppendResult> =
+        fun store streamName appendVersion messageDetails ->
             store.AppendToStream
-                (StreamId(streamDetails.streamName),
-                 fromAppendVersion streamDetails.version,
+                (StreamId(streamName),
+                 fromAppendVersion appendVersion,
                  [| newStreamMessageFromMessageDetails messageDetails |])
             |> Async.AwaitTask
 
-    let appendNewMessages: SqlStreamStore.IStreamStore -> AppendStreamDetails -> List<MessageDetails> -> Async<AppendResult> =
-        fun store streamDetails messages ->
+    let appendNewMessages: SqlStreamStore.IStreamStore -> StreamName -> AppendVersion -> List<MessageDetails> -> Async<AppendResult> =
+        fun store streamName appendVersion messages ->
             store.AppendToStream
-                (StreamId(streamDetails.streamName),
-                 fromAppendVersion streamDetails.version,
+                (StreamId(streamName),
+                 fromAppendVersion appendVersion,
                  messages
                  |> List.map newStreamMessageFromMessageDetails
                  |> List.toArray)

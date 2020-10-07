@@ -11,6 +11,7 @@ type MessageDetails =
       jsonData: string
       jsonMetadata: string }
 
+type StreamName = string
 
 [<RequireQualifiedAccessAttribute>]
 type AppendVersion =
@@ -18,14 +19,6 @@ type AppendVersion =
     | EmptyStream
     | NoStream
     | SpecificVersion of int
-
-type AppendStreamDetails =
-    { streamName: string
-      version: AppendVersion }
-
-type ReadStreamDetails =
-    { streamName: string
-      version: ReadVersion }
 
 and ReadVersion = uint
 

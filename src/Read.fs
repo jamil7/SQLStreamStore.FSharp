@@ -22,31 +22,31 @@ module Read =
                 store.ReadAllBackwards(startPositionInclusive, msgCount, prefetchJson, cancellationToken)
             |> Async.AwaitTask
 
-    let readFromStreamAsync: SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> Async<ReadStreamPage> =
-        fun store readingDirection readStreamDetails msgCount ->
+    let readFromStreamAsync: SqlStreamStore.IStreamStore -> ReadingDirection -> StreamName -> ReadVersion -> MessageCount -> Async<ReadStreamPage> =
+        fun store readingDirection streamName readVersion msgCount ->
             match readingDirection with
             | ReadingDirection.Forward ->
                 store.ReadStreamForwards
-                    (StreamId(readStreamDetails.streamName), fromReadVersion readStreamDetails.version, msgCount)
+                    (StreamId(streamName), fromReadVersion readVersion, msgCount)
             | ReadingDirection.Backward ->
                 store.ReadStreamBackwards
-                    (StreamId(readStreamDetails.streamName), fromReadVersion readStreamDetails.version, msgCount)
+                    (StreamId(streamName), fromReadVersion readVersion, msgCount)
             |> Async.AwaitTask
 
-    let readFromStreamAsync': SqlStreamStore.IStreamStore -> ReadingDirection -> ReadStreamDetails -> MessageCount -> bool -> CancellationToken -> Async<ReadStreamPage> =
-        fun store readingDirection readStreamDetails msgCount prefetchJson cancellationToken ->
+    let readFromStreamAsync': SqlStreamStore.IStreamStore -> ReadingDirection -> StreamName -> ReadVersion -> MessageCount -> bool -> CancellationToken -> Async<ReadStreamPage> =
+        fun store readingDirection streamName readVersion msgCount prefetchJson cancellationToken ->
             match readingDirection with
             | ReadingDirection.Forward ->
                 store.ReadStreamForwards
-                    (StreamId(readStreamDetails.streamName),
-                     fromReadVersion readStreamDetails.version,
+                    (StreamId(streamName),
+                     fromReadVersion readVersion,
                      msgCount,
                      prefetchJson,
                      cancellationToken)
             | ReadingDirection.Backward ->
                 store.ReadStreamBackwards
-                    (StreamId(readStreamDetails.streamName),
-                     fromReadVersion readStreamDetails.version,
+                    (StreamId(streamName),
+                     fromReadVersion readVersion,
                      msgCount,
                      prefetchJson,
                      cancellationToken)
