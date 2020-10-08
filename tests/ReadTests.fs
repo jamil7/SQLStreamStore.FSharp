@@ -13,7 +13,7 @@ let tests =
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
               let streamName = "test"
-              
+
               let appendVersion = AppendVersion.NoStream
 
               let guidString1 = "11111111-1111-1111-1111-111111111111"
@@ -37,9 +37,9 @@ let tests =
               do! Append.appendNewMessages inMemStore streamName appendVersion msgList
                   |> Async.Ignore
 
-              let  readVersion = 0u 
+              let readVersion = 0u
 
-              let! readResult = Read.readFromStreamAsync inMemStore ReadingDirection.Forward streamName readVersion 10
+              let! readResult = Read.readFromStream inMemStore ReadingDirection.Forward streamName readVersion 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
