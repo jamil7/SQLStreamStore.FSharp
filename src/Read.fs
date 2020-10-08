@@ -4,7 +4,11 @@ open System.Threading
 open SqlStreamStore.Streams
 
 module Read =
-    let private fromReadVersion: uint -> int = fun readVersion -> int (readVersion)
+    let private fromReadVersion: ReadVersion -> int =
+        function
+        | ReadVersion.Start -> int (Position.Start)
+        | ReadVersion.End -> int (Position.End)
+        | ReadVersion.SpecificVersion version -> int (version)
 
     let readFromAllStream: SqlStreamStore.IStreamStore -> ReadingDirection -> StartPositionInclusive -> MessageCount -> Async<ReadAllPage> =
         fun store readingDirection startPositionInclusive msgCount ->

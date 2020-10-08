@@ -14,13 +14,17 @@ type MessageDetails =
 type StreamName = string
 
 [<RequireQualifiedAccessAttribute>]
+type ReadVersion =
+     | Start
+     | End
+     | SpecificVersion of uint
+
+[<RequireQualifiedAccessAttribute>]
 type AppendVersion =
     | Any
     | EmptyStream
     | NoStream
     | SpecificVersion of int
-
-and ReadVersion = uint
 
 type StartPositionInclusive = int64
 type MessageCount = int
