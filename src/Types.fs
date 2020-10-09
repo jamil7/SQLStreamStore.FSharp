@@ -15,9 +15,9 @@ type StreamName = string
 
 [<RequireQualifiedAccessAttribute>]
 type ReadVersion =
-     | Start
-     | End
-     | SpecificVersion of uint
+    | Start
+    | End
+    | SpecificVersion of uint
 
 [<RequireQualifiedAccessAttribute>]
 type AppendVersion =
@@ -26,7 +26,12 @@ type AppendVersion =
     | NoStream
     | SpecificVersion of int
 
-type StartPositionInclusive = int64
+[<RequireQualifiedAccessAttribute>]
+type StartPosition =
+    | Start
+    | End
+    | SpecificPosition of int64
+
 type MessageCount = int
 
 [<RequireQualifiedAccessAttribute>]
