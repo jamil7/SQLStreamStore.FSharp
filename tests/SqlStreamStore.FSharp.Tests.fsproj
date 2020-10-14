@@ -10,6 +10,7 @@
         <Compile Include="AppendRawTests.fs" />
         <Compile Include="AppendTests.fs" />
         <Compile Include="ReadRawTests.fs" />
+        <Compile Include="ReadTests.fs" />
         <Compile Include="Program.fs" />
     </ItemGroup>
 

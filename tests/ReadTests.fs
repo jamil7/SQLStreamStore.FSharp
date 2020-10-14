@@ -1,4 +1,4 @@
-module SqlStreamStore.FSharp.Tests.ReadRawTests
+module SqlStreamStore.FSharp.Tests.ReadTests
 
 open Expecto
 open SqlStreamStore.FSharp
@@ -16,7 +16,7 @@ let guidString2 = "22222222-2222-2222-2222-222222222222"
 [<Tests>]
 let tests =
     testList
-        "ReadRaw Tests"
+        "Read Tests"
         [ testAsync "Should read forward from specific stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
@@ -149,3 +149,5 @@ let tests =
                       guidString1
                       "Error: first message in stream doesn't match."
           } ]
+
+
