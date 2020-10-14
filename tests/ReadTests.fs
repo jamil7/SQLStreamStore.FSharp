@@ -3,12 +3,11 @@ module SqlStreamStore.FSharp.Tests.ReadTests
 open Expecto
 open SqlStreamStore.FSharp
 
-let newTestMessage: string -> MessageDetails =
-    fun guid ->
-        { id = StreamMessageId.Custom(System.Guid.Parse(guid))
-          type_ = "testing"
-          jsonData = "{}"
-          jsonMetadata = "{}" }
+let newTestMessage (guidString: string): MessageDetails =
+    { id = StreamMessageId.Custom(System.Guid.Parse(guidString))
+      type_ = "testing"
+      jsonData = "{}"
+      jsonMetadata = "{}" }
 
 let guidString1 = "11111111-1111-1111-1111-111111111111"
 
@@ -41,8 +40,14 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
-                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[0].MessageId.ToString())
+                      guidString1
+                      "Error: first message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[1].MessageId.ToString())
+                      guidString2
+                      "Error: second message in stream doesn't match."
           }
           testAsync "Should read Backward from specific stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
@@ -67,8 +72,14 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
-                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[1].MessageId.ToString())
+                      guidString2
+                      "Error: second message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[0].MessageId.ToString())
+                      guidString1
+                      "Error: first message in stream doesn't match."
           }
 
           testAsync "Should read from all streams forward." {
@@ -95,8 +106,14 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
-                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[0].MessageId.ToString())
+                      guidString1
+                      "Error: first message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[1].MessageId.ToString())
+                      guidString2
+                      "Error: second message in stream doesn't match."
           }
 
           testAsync "Should read from all streams backward." {
@@ -123,6 +140,12 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
-                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[1].MessageId.ToString())
+                      guidString2
+                      "Error: second message in stream doesn't match."
+                  Expect.equal
+                      (sorted.[0].MessageId.ToString())
+                      guidString1
+                      "Error: first message in stream doesn't match."
           } ]
