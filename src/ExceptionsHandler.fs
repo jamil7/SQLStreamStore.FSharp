@@ -1,4 +1,4 @@
-namespace SqlStreamStore.Fsharp
+namespace SqlStreamStore.FSharp
 
 module Async =
     let bind f m = async.Bind(m, f)
