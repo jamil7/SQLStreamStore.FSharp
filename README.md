@@ -15,10 +15,13 @@ For more complete implementations check out other libraries such as [Equinox](ht
 - Reading a `StreamMessage`
 - Appending a `StreamMessage`
 
+## Not Supported functionality
+- Subscribtions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
+
 ## TODO
 
 - ~~Postgres connector~~
 - ~~Read a stream message~~
 - ~~Write a stream message~~
-- Subscribe to a stream
+- ~~Subscribe to a stream~~
 - Work on ReadExtras, and AppendExtras modules that wrap read and appends in AsyncResult type for error handeling
