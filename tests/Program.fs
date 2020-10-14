@@ -1,4 +1,6 @@
-﻿open Expecto
+﻿module Main
+
+open Expecto
 
 [<EntryPoint>]
 let main args =
