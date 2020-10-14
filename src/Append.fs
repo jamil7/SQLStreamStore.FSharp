@@ -4,7 +4,7 @@ open SqlStreamStore.Streams
 
 module Append =
     let appendNewMessage (store: SqlStreamStore.IStreamStore)
-                         (streamName: StreamName)
+                         (streamName: string)
                          (appendVersion: AppendVersion)
                          (messageDetails: MessageDetails)
                          : Async<Result<AppendResult, string>> =
@@ -12,7 +12,7 @@ module Append =
         |> ExceptionsHandler.simpleExceptionHandler 
 
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
-                          (streamName: StreamName)
+                          (streamName: string)
                           (appendVersion: AppendVersion)
                           (messages: MessageDetails list)
                           : Async<Result<AppendResult, string>> =

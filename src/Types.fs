@@ -11,8 +11,6 @@ type MessageDetails =
       jsonData: string
       jsonMetadata: string }
 
-type StreamName = string
-
 [<RequireQualifiedAccessAttribute>]
 type ReadVersion =
     | Start
@@ -31,8 +29,6 @@ type StartPosition =
     | Start
     | End
     | SpecificPosition of int64
-
-type MessageCount = int
 
 [<RequireQualifiedAccessAttribute>]
 type ReadingDirection =

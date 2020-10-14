@@ -9,11 +9,10 @@ module AppendRaw =
         | StreamMessageId.Custom guid -> guid
         | StreamMessageId.Auto -> System.Guid.NewGuid()
 
-    let private newStreamMessageFromMessageDetails: MessageDetails -> NewStreamMessage =
-        fun msg ->
-            match msg.jsonMetadata with
-            | "" -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData)
-            | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData, metadata)
+    let private newStreamMessageFromMessageDetails (msg: MessageDetails): NewStreamMessage =
+        match msg.jsonMetadata with
+        | "" -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData)
+        | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData, metadata)
 
     let private fromAppendVersion: AppendVersion -> int =
         function
@@ -22,20 +21,26 @@ module AppendRaw =
         | AppendVersion.NoStream -> ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
 
-    let appendNewMessage: SqlStreamStore.IStreamStore -> StreamName -> AppendVersion -> MessageDetails -> Async<AppendResult> =
-        fun store streamName appendVersion messageDetails ->
-            store.AppendToStream
-                (StreamId(streamName),
-                 fromAppendVersion appendVersion,
-                 [| newStreamMessageFromMessageDetails messageDetails |])
-            |> Async.AwaitTask
+    let appendNewMessage (store: SqlStreamStore.IStreamStore)
+                         (streamName: string)
+                         (appendVersion: AppendVersion)
+                         (messageDetails: MessageDetails)
+                         : Async<AppendResult> =
+        store.AppendToStream
+            (StreamId(streamName),
+             fromAppendVersion appendVersion,
+             [| newStreamMessageFromMessageDetails messageDetails |])
+        |> Async.AwaitTask
 
-    let appendNewMessages: SqlStreamStore.IStreamStore -> StreamName -> AppendVersion -> List<MessageDetails> -> Async<AppendResult> =
-        fun store streamName appendVersion messages ->
-            store.AppendToStream
-                (StreamId(streamName),
-                 fromAppendVersion appendVersion,
-                 messages
-                 |> List.map newStreamMessageFromMessageDetails
-                 |> List.toArray)
-            |> Async.AwaitTask
+    let appendNewMessages (store: SqlStreamStore.IStreamStore)
+                          (streamName: string)
+                          (appendVersion: AppendVersion)
+                          (messages: MessageDetails list)
+                          : Async<AppendResult> =
+        store.AppendToStream
+            (StreamId(streamName),
+             fromAppendVersion appendVersion,
+             messages
+             |> List.map newStreamMessageFromMessageDetails
+             |> List.toArray)
+        |> Async.AwaitTask

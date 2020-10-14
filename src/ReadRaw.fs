@@ -16,42 +16,59 @@ module ReadRaw =
         | StartPosition.End -> -1L
         | StartPosition.SpecificPosition position -> position
 
-    let readFromAllStream: SqlStreamStore.IStreamStore -> ReadingDirection -> StartPosition -> MessageCount -> Async<ReadAllPage> =
-        fun store readingDirection startPositionInclusive msgCount ->
-            match readingDirection with
-            | ReadingDirection.Forward ->
-                store.ReadAllForwards(fromStartPositionInclusive startPositionInclusive, msgCount)
-            | ReadingDirection.Backward ->
-                store.ReadAllBackwards(fromStartPositionInclusive startPositionInclusive, msgCount)
-            |> Async.AwaitTask
+    let readFromAllStream (store: SqlStreamStore.IStreamStore)
+                          (readingDirection: ReadingDirection)
+                          (startPositionInclusive: StartPosition)
+                          (msgCount: int)
+                          : Async<ReadAllPage> =
+        match readingDirection with
+        | ReadingDirection.Forward -> store.ReadAllForwards(fromStartPositionInclusive startPositionInclusive, msgCount)
+        | ReadingDirection.Backward ->
+            store.ReadAllBackwards(fromStartPositionInclusive startPositionInclusive, msgCount)
+        |> Async.AwaitTask
 
-    let readFromAllStream': SqlStreamStore.IStreamStore -> ReadingDirection -> StartPosition -> MessageCount -> bool -> CancellationToken -> Async<ReadAllPage> =
-        fun store readingDirection startPositionInclusive msgCount prefetchJson cancellationToken ->
-            match readingDirection with
-            | ReadingDirection.Forward ->
-                store.ReadAllForwards
-                    (fromStartPositionInclusive startPositionInclusive, msgCount, prefetchJson, cancellationToken)
-            | ReadingDirection.Backward ->
-                store.ReadAllBackwards
-                    (fromStartPositionInclusive startPositionInclusive, msgCount, prefetchJson, cancellationToken)
-            |> Async.AwaitTask
+    let readFromStream (store: SqlStreamStore.IStreamStore)
+                       (readingDirection: ReadingDirection)
+                       (streamName: string)
+                       (readVersion: ReadVersion)
+                       (msgCount: int)
+                       : Async<ReadStreamPage> =
+        match readingDirection with
+        | ReadingDirection.Forward ->
+            store.ReadStreamForwards(StreamId(streamName), fromReadVersion readVersion, msgCount)
+        | ReadingDirection.Backward ->
+            store.ReadStreamBackwards(StreamId(streamName), fromReadVersion readVersion, msgCount)
+        |> Async.AwaitTask
 
-    let readFromStream: SqlStreamStore.IStreamStore -> ReadingDirection -> StreamName -> ReadVersion -> MessageCount -> Async<ReadStreamPage> =
-        fun store readingDirection streamName readVersion msgCount ->
-            match readingDirection with
-            | ReadingDirection.Forward ->
-                store.ReadStreamForwards(StreamId(streamName), fromReadVersion readVersion, msgCount)
-            | ReadingDirection.Backward ->
-                store.ReadStreamBackwards(StreamId(streamName), fromReadVersion readVersion, msgCount)
-            |> Async.AwaitTask
+    let readFromAllStream' (store: SqlStreamStore.IStreamStore)
+                           (readingDirection: ReadingDirection)
+                           (startPositionInclusive: StartPosition)
+                           (msgCount: int)
+                           (prefetchJson: bool)
+                           (cancellationToken: CancellationToken)
+                           : Async<ReadAllPage> =
+        match readingDirection with
+        | ReadingDirection.Forward ->
+            store.ReadAllForwards
+                (fromStartPositionInclusive startPositionInclusive, msgCount, prefetchJson, cancellationToken)
+        | ReadingDirection.Backward ->
+            store.ReadAllBackwards
+                (fromStartPositionInclusive startPositionInclusive, msgCount, prefetchJson, cancellationToken)
+        |> Async.AwaitTask
 
-    let readFromStream': SqlStreamStore.IStreamStore -> ReadingDirection -> StreamName -> ReadVersion -> MessageCount -> bool -> CancellationToken -> Async<ReadStreamPage> =
-        fun store readingDirection streamName readVersion msgCount prefetchJson cancellationToken ->
-            match readingDirection with
-            | ReadingDirection.Forward ->
-                store.ReadStreamForwards
-                    (StreamId(streamName), fromReadVersion readVersion, msgCount, prefetchJson, cancellationToken)
-            | ReadingDirection.Backward ->
-                store.ReadStreamBackwards
-                    (StreamId(streamName), fromReadVersion readVersion, msgCount, prefetchJson, cancellationToken)
-            |> Async.AwaitTask
+    let readFromStream' (store: SqlStreamStore.IStreamStore)
+                        (readingDirection: ReadingDirection)
+                        (streamName: string)
+                        (readVersion: ReadVersion)
+                        (msgCount: int)
+                        (prefetchJson: bool)
+                        (cancellationToken: CancellationToken)
+                        : Async<ReadStreamPage> =
+        match readingDirection with
+        | ReadingDirection.Forward ->
+            store.ReadStreamForwards
+                (StreamId(streamName), fromReadVersion readVersion, msgCount, prefetchJson, cancellationToken)
+        | ReadingDirection.Backward ->
+            store.ReadStreamBackwards
+                (StreamId(streamName), fromReadVersion readVersion, msgCount, prefetchJson, cancellationToken)
+        |> Async.AwaitTask
