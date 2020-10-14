@@ -35,11 +35,6 @@ type StartPosition =
 type MessageCount = int
 
 [<RequireQualifiedAccessAttribute>]
-type AppendException =
-    | WrongExpectedVersion of System.Exception
-    | Other of System.Exception
-
-[<RequireQualifiedAccessAttribute>]
 type ReadingDirection =
     | Forward
     | Backward
