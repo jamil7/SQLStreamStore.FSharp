@@ -11,10 +11,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="AsyncExtras.fs" />
+        <Compile Include="ExceptionHandler.fs" />
         <Compile Include="Types.fs" />
+        <Compile Include="AppendRaw.fs" />
+        <Compile Include="ReadRaw.fs" />
+        <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
-        <Compile Include="Postgres.fs" />
     </ItemGroup>
 
     <ItemGroup>

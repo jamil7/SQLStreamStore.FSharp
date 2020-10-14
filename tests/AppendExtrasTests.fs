@@ -1,18 +1,19 @@
-module SqlStreamStore.FSharp.Tests.AppendTests
+module SqlStreamStore.FSharp.Tests.AppendExtrasTests
 
 open Expecto
+
 open SqlStreamStore.FSharp
 
 
 [<Tests>]
 let tests =
     testList
-        "Append Tests"
+        "AppendExtras Tests"
         [ testAsync "Should append one message to stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
               let streamName = "test"
-              
+
               let appendVersion = AppendVersion.NoStream
 
               let msg =
@@ -30,7 +31,7 @@ let tests =
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
               let streamName = "test"
-              
+
               let appendVersion = AppendVersion.NoStream
 
               let msg1 =
