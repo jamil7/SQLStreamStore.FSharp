@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <Compile Include="AsyncExtras.fs" />
-        <Compile Include="ExceptionHandler.fs" />
+        <Compile Include="ExceptionsHandler.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="AppendRaw.fs" />
         <Compile Include="ReadRaw.fs" />

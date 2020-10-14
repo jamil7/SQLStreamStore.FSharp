@@ -1,4 +1,4 @@
-module ExceptionHandler
+module ExceptionsHandler
 
 let simpleExceptionHandler (op: Async<'res>): Async<Result<'res, string>> =
         op

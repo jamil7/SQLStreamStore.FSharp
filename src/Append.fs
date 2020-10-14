@@ -9,7 +9,7 @@ module Append =
                          (messageDetails: MessageDetails)
                          : Async<Result<AppendResult, string>> =
         AppendRaw.appendNewMessage store streamName appendVersion messageDetails
-        |> ExceptionHandler.simpleExceptionHandler 
+        |> ExceptionsHandler.simpleExceptionHandler 
 
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
                           (streamName: StreamName)
@@ -17,4 +17,4 @@ module Append =
                           (messages: MessageDetails list)
                           : Async<Result<AppendResult, string>> =
         AppendRaw.appendNewMessages store streamName appendVersion messages
-        |> ExceptionHandler.simpleExceptionHandler 
+        |> ExceptionsHandler.simpleExceptionHandler 
