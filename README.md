@@ -24,4 +24,5 @@ For more complete implementations check out other libraries such as [Equinox](ht
 - ~~Read a stream message~~
 - ~~Write a stream message~~
 - ~~Subscribe to a stream~~
-- Work on ReadExtras, and AppendExtras modules that wrap read and appends in AsyncResult type for error handeling
+- ~~Work on Read, and Append modules that wrap read and appends in AsyncResult type for error handeling~~
+- Add additional tests when Append and Read fail, and throw exceptions.
