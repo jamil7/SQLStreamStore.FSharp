@@ -16,7 +16,7 @@ For more complete implementations check out other libraries such as [Equinox](ht
 - Appending a `StreamMessage`
 
 ## Not Supported functionality
-- Subscribtions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
+- Subscriptions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
 
 ## TODO
 
