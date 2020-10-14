@@ -9,8 +9,13 @@ module Read =
                           (msgCount: MessageCount)
                           : Async<Result<ReadAllPage, string>> =
         ReadRaw.readFromAllStream store readingDirection startPositionInclusive msgCount
-        |> ExceptionsHandler.simpleExceptionHandler 
+        |> ExceptionsHandler.simpleExceptionHandler
 
-    let readFromStream store readingDirection streamName readVersion msgCount =
+    let readFromStream (store: SqlStreamStore.IStreamStore)
+                       (readingDirection: ReadingDirection)
+                       (streamName: StreamName)
+                       (readVersion: ReadVersion)
+                       (msgCount: MessageCount)
+                       : Async<Result<ReadStreamPage, string>> =
         ReadRaw.readFromStream store readingDirection streamName readVersion msgCount
-        |> ExceptionsHandler.simpleExceptionHandler 
+        |> ExceptionsHandler.simpleExceptionHandler
