@@ -8,7 +8,7 @@ open SqlStreamStore.FSharp
 [<Tests>]
 let tests =
     testList
-        "AppendExtras Tests"
+        "Append Tests"
         [ testAsync "Should append one message to stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
 
