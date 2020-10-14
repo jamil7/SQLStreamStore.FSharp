@@ -4,7 +4,6 @@ module Async =
     let map f m = async.Bind(m, (f >> async.Return))
 
 module ExceptionsHandler =
-
     let simpleExceptionHandler (op: Async<'res>): Async<Result<'res, string>> =
         op
         |> Async.Catch
