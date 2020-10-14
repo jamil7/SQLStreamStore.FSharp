@@ -2,7 +2,6 @@ module SqlStreamStore.FSharp.Tests.AppendTests
 
 open Expecto
 open SqlStreamStore.FSharp
-open SqlStreamStore.FSharp.Tests
 
 
 [<Tests>]
@@ -24,7 +23,7 @@ let tests =
 
               let! appendResult = Append.appendNewMessage inMemStore streamName appendVersion msg
 
-              ExpectExtra.equal 0 appendResult.CurrentVersion
+              Expect.equal appendResult.CurrentVersion 0 "Error: message version doesn't match."
           }
 
           testAsync "Should append a list of messages to stream." {
@@ -49,5 +48,5 @@ let tests =
               let msgList = [ msg1; msg2 ]
 
               let! appendResult = Append.appendNewMessages inMemStore streamName appendVersion msgList
-              ExpectExtra.equal 1 appendResult.CurrentVersion
+              Expect.equal appendResult.CurrentVersion 1 "Error: message version doesn't match."
           } ]

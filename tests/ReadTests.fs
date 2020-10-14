@@ -2,8 +2,6 @@ module SqlStreamStore.FSharp.Tests.ReadTests
 
 open Expecto
 open SqlStreamStore.FSharp
-open SqlStreamStore.FSharp.Tests
-
 
 let newTestMessage: string -> MessageDetails =
     fun guid ->
@@ -43,8 +41,8 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  ExpectExtra.equal guidString1 (sorted.[0].MessageId.ToString())
-                  ExpectExtra.equal guidString2 (sorted.[1].MessageId.ToString())
+                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
+                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
           }
           testAsync "Should read Backward from specific stream." {
               let inMemStore = new SqlStreamStore.InMemoryStreamStore()
@@ -69,8 +67,8 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  ExpectExtra.equal guidString2 (sorted.[1].MessageId.ToString())
-                  ExpectExtra.equal guidString1 (sorted.[0].MessageId.ToString())
+                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
+                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
           }
 
           testAsync "Should read from all streams forward." {
@@ -97,8 +95,8 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  ExpectExtra.equal guidString1 (sorted.[0].MessageId.ToString())
-                  ExpectExtra.equal guidString2 (sorted.[1].MessageId.ToString())
+                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
+                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
           }
 
           testAsync "Should read from all streams backward." {
@@ -125,6 +123,6 @@ let tests =
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
               |> fun sorted ->
-                  ExpectExtra.equal guidString2 (sorted.[1].MessageId.ToString())
-                  ExpectExtra.equal guidString1 (sorted.[0].MessageId.ToString())
+                  Expect.equal (sorted.[1].MessageId.ToString()) guidString2 "Error: second message in stream doesn't match."
+                  Expect.equal (sorted.[0].MessageId.ToString()) guidString1 "Error: first message in stream doesn't match."
           } ]
