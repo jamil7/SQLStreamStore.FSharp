@@ -1,4 +1,4 @@
-module SqlStreamStore.FSharp.Tests.AppendTests
+module SqlStreamStore.FSharp.Tests.AppendRawTests
 
 open Expecto
 open SqlStreamStore.FSharp
