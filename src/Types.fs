@@ -12,17 +12,17 @@ type MessageDetails =
       jsonMetadata: string }
 
 [<RequireQualifiedAccessAttribute>]
-type ReadVersion =
-    | Start
-    | End
-    | SpecificVersion of uint
-
-[<RequireQualifiedAccessAttribute>]
 type AppendVersion =
     | Any
     | EmptyStream
     | NoStream
     | SpecificVersion of int
+
+[<RequireQualifiedAccessAttribute>]
+type ReadVersion =
+    | Start
+    | End
+    | SpecificVersion of uint
 
 [<RequireQualifiedAccessAttribute>]
 type StartPosition =
