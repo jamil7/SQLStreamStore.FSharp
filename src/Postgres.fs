@@ -8,8 +8,8 @@ type PostgresConfig =
       database: string }
 
 type PoolingConfig =
-    { minSize: int option
-      maxSize: int option
+    { minPoolSize: int option
+      maxPoolSize: int option
       connectionIdleLifeTime: int option
       connectionPruningInterval: int option }
 
@@ -24,10 +24,10 @@ module Postgres =
             config.database
 
     let private poolingSettings (pooling: PoolingConfig): string =
-        let minSize = pooling.minSize |> Option.defaultValue 0
+        let minSize = pooling.minPoolSize |> Option.defaultValue 0
 
         let maxSize =
-            pooling.maxSize |> Option.defaultValue 100
+            pooling.maxPoolSize |> Option.defaultValue 100
 
         let connectionPruningInterval =
             pooling.connectionPruningInterval
