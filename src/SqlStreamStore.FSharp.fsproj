@@ -8,7 +8,7 @@
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/jamil7/SQLStreamStore.FSharp</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageTags>SqlStreamStore; FSharp; postgresql; cqrs; event-sourcing; event-store; stream-store</PackageTags>
+        <PackageTags>SqlStreamStore; F#; FSharp; postgresql; cqrs; event-sourcing; event-store; stream-store</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
