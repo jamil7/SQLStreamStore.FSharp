@@ -24,7 +24,8 @@ module Postgres =
             config.database
 
     let private poolingSettings (pooling: PoolingConfig): string =
-        let minSize = pooling.minPoolSize |> Option.defaultValue 0
+        let minSize =
+            pooling.minPoolSize |> Option.defaultValue 0
 
         let maxSize =
             pooling.maxPoolSize |> Option.defaultValue 100
@@ -53,6 +54,9 @@ module Postgres =
     let createStoreWithPoolingConfig (config: PostgresConfig) (pooling: PoolingConfig): SqlStreamStore.PostgresStreamStore =
         new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings
                                                    (storeSettingsWithPooling config pooling))
+
+    let createStoreWithConfigString (config: string): SqlStreamStore.PostgresStreamStore =
+        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(config))
 
     let createSchema (store: SqlStreamStore.PostgresStreamStore): Async<unit> =
         store.CreateSchemaIfNotExists() |> Async.AwaitTask
