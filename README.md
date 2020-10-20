@@ -17,11 +17,4 @@ Wrapping only the basic functionality, and sticking to the naming conventions in
 - Subscriptions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
 
 ## TODO
-
-- ~~Postgres connector~~
-- ~~Read a stream message~~
-- ~~Write a stream message~~
-- ~~Subscribe to a stream~~
-- ~~Work on Read, and Append modules that wrap read and appends in AsyncResult type for error handeling~~
-- Add additional tests when Append and Read fail, and throw exceptions.
-- Add functionality to Read to be able to get messages directly.
+This section is now moved to the Project tab :D
