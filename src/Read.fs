@@ -9,7 +9,7 @@ module Read =
                           (msgCount: int)
                           : Async<Result<ReadAllPage, string>> =
         ReadRaw.readFromAllStream store readingDirection startPositionInclusive msgCount
-        |> ExceptionsHandler.simpleExceptionHandler
+        |> ExceptionsHandler.asyncExceptionHandler
 
     let readFromStream (store: SqlStreamStore.IStreamStore)
                        (readingDirection: ReadingDirection)
@@ -18,7 +18,7 @@ module Read =
                        (msgCount: int)
                        : Async<Result<ReadStreamPage, string>> =
         ReadRaw.readFromStream store readingDirection streamName readVersion msgCount
-        |> ExceptionsHandler.simpleExceptionHandler
+        |> ExceptionsHandler.asyncExceptionHandler
 
     let readFromAllStreamAndPrefetchJsonData (store: SqlStreamStore.IStreamStore)
                                              (readingDirection: ReadingDirection)
@@ -26,7 +26,7 @@ module Read =
                                              (msgCount: int)
                                              : Async<Result<ReadAllPage, string>> =
         ReadRaw.readFromAllStream' store readingDirection startPositionInclusive msgCount true
-        |> ExceptionsHandler.simpleExceptionHandler
+        |> ExceptionsHandler.asyncExceptionHandler
 
     let readFromStreamAndPrefetchJsonData (store: SqlStreamStore.IStreamStore)
                                           (readingDirection: ReadingDirection)
@@ -35,4 +35,4 @@ module Read =
                                           (msgCount: int)
                                           : Async<Result<ReadStreamPage, string>> =
         ReadRaw.readFromStream' store readingDirection streamName readVersion msgCount true
-        |> ExceptionsHandler.simpleExceptionHandler
+        |> ExceptionsHandler.asyncExceptionHandler
