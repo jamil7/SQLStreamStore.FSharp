@@ -15,6 +15,3 @@ Wrapping only the basic functionality, and sticking to the naming conventions in
 
 ## Not Supported functionality
 - Subscriptions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
-
-## TODO
-This section is now moved to the Projects tab :D
