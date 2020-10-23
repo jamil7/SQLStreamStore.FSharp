@@ -26,21 +26,23 @@ module AppendRaw =
                          (appendVersion: AppendVersion)
                          (messageDetails: MessageDetails)
                          : Async<AppendResult> =
-        store.AppendToStream
-            (StreamId(streamName),
-             fromAppendVersion appendVersion,
-             [| newStreamMessageFromMessageDetails messageDetails |])
-        |> Async.AwaitTask
+        async.Delay(fun () ->
+            store.AppendToStream
+                (StreamId(streamName),
+                 fromAppendVersion appendVersion,
+                 [| newStreamMessageFromMessageDetails messageDetails |])
+            |> Async.AwaitTask)
 
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
                           (streamName: string)
                           (appendVersion: AppendVersion)
                           (messages: MessageDetails list)
                           : Async<AppendResult> =
-        store.AppendToStream
-            (StreamId(streamName),
-             fromAppendVersion appendVersion,
-             messages
-             |> List.map newStreamMessageFromMessageDetails
-             |> List.toArray)
-        |> Async.AwaitTask
+        async.Delay(fun () ->
+            store.AppendToStream
+                (StreamId(streamName),
+                 fromAppendVersion appendVersion,
+                 messages
+                 |> List.map newStreamMessageFromMessageDetails
+                 |> List.toArray)
+            |> Async.AwaitTask)

@@ -61,7 +61,7 @@ module Postgres =
         new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(config))
 
     let createSchemaRaw (store: SqlStreamStore.PostgresStreamStore): Async<unit> =
-        store.CreateSchemaIfNotExists() |> Async.AwaitTask
+        async.Delay(fun () -> store.CreateSchemaIfNotExists() |> Async.AwaitTask)
 
     let createSchema (store: SqlStreamStore.PostgresStreamStore): Async<Result<unit, string>> =
         createSchemaRaw store
