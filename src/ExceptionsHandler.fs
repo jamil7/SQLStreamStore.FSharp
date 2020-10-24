@@ -1,10 +1,7 @@
 namespace SqlStreamStore.FSharp
 
-module Async =
-    let map f m = async.Bind(m, (f >> async.Return))
-
 module ExceptionsHandler =
-    let asyncExceptionHandler (op: Async<'res>): Async<Result<'res, string>> =
+    let asyncExceptionHandler (op: Async<'suc>): Async<Result<'suc, string>> =
         op
         |> Async.Catch
         |> Async.map (function
