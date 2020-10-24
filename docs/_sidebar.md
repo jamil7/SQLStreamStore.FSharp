@@ -1,2 +1,0 @@
-- Getting Started
-    - [Introduction] (introduction.md)
