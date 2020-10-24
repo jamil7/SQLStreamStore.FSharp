@@ -11,3 +11,4 @@ tests/bin
 tests/obj
 
 Release/
+site/
