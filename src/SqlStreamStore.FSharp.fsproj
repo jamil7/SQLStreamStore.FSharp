@@ -12,6 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Async.fs" />
         <Compile Include="ExceptionsHandler.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="AppendRaw.fs" />
