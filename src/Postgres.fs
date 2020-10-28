@@ -7,7 +7,8 @@ type PostgresConfig =
       port: string
       username: string
       password: string
-      database: string }
+      database: string
+      schema: string option }
 
 type PoolingConfig =
     { minPoolSize: int option
@@ -51,7 +52,14 @@ module Postgres =
         sprintf "%s;%s" (storeSettings config) (poolingSettings pooling)
 
     let createStore (config: PostgresConfig): SqlStreamStore.PostgresStreamStore =
-        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(storeSettings config))
+        let settings =
+            SqlStreamStore.PostgresStreamStoreSettings(storeSettings config)
+
+        match config.schema with
+        | None -> ()
+        | Some (schema) -> settings.Schema <- schema
+
+        new SqlStreamStore.PostgresStreamStore(settings)
 
     let createStoreWithPoolingConfig (config: PostgresConfig) (pooling: PoolingConfig): SqlStreamStore.PostgresStreamStore =
         new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings
