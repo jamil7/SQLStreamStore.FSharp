@@ -51,19 +51,28 @@ module Postgres =
     let private storeSettingsWithPooling (config: PostgresConfig) (pooling: PoolingConfig): string =
         sprintf "%s;%s" (storeSettings config) (poolingSettings pooling)
 
-    let createStore (config: PostgresConfig): SqlStreamStore.PostgresStreamStore =
-        let settings =
-            SqlStreamStore.PostgresStreamStoreSettings(storeSettings config)
-
+    let private setSettingsSchema (config: PostgresConfig)
+                                  (settings: SqlStreamStore.PostgresStreamStoreSettings)
+                                  : SqlStreamStore.PostgresStreamStoreSettings =
         match config.schema with
         | None -> ()
         | Some (schema) -> settings.Schema <- schema
 
+        settings
+
+    let createStore (config: PostgresConfig): SqlStreamStore.PostgresStreamStore =
+        let settings =
+            SqlStreamStore.PostgresStreamStoreSettings(storeSettings config)
+            |> setSettingsSchema config
+
         new SqlStreamStore.PostgresStreamStore(settings)
 
     let createStoreWithPoolingConfig (config: PostgresConfig) (pooling: PoolingConfig): SqlStreamStore.PostgresStreamStore =
-        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings
-                                                   (storeSettingsWithPooling config pooling))
+        let settings =
+            SqlStreamStore.PostgresStreamStoreSettings(storeSettingsWithPooling config pooling)
+            |> setSettingsSchema config
+
+        new SqlStreamStore.PostgresStreamStore(settings)
 
     let createStoreWithConfigString (config: string): SqlStreamStore.PostgresStreamStore =
         new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(config))
