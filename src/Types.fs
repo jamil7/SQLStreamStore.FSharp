@@ -20,17 +20,10 @@ type AppendVersion =
 
 [<RequireQualifiedAccessAttribute>]
 type ReadVersion =
-    | Start
-    | End
+    | Any
     | SpecificVersion of uint
 
 [<RequireQualifiedAccessAttribute>]
 type StartPosition =
-    | Start
-    | End
+    | Any
     | SpecificPosition of int64
-
-[<RequireQualifiedAccessAttribute>]
-type ReadingDirection =
-    | Forward
-    | Backward

@@ -33,9 +33,9 @@ let tests =
               do! AppendRaw.appendNewMessages inMemStore streamName appendVersion msgList
                   |> Async.Ignore
 
-              let readVersion = ReadVersion.Start
+              let readVersion = ReadVersion.Any
 
-              let! readResult = ReadRaw.readFromStream inMemStore ReadingDirection.Forward streamName readVersion 10
+              let! readResult = ReadRaw.streamForwards inMemStore streamName readVersion 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
@@ -65,9 +65,9 @@ let tests =
               do! AppendRaw.appendNewMessages inMemStore streamName appendVersion msgList
                   |> Async.Ignore
 
-              let readVersion = ReadVersion.End
+              let readVersion = ReadVersion.Any
 
-              let! readResult = ReadRaw.readFromStream inMemStore ReadingDirection.Backward streamName readVersion 10
+              let! readResult = ReadRaw.streamBackwards inMemStore streamName readVersion 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
@@ -101,7 +101,7 @@ let tests =
               do! AppendRaw.appendNewMessage inMemStore stream2 appendVersion msg2
                   |> Async.Ignore
 
-              let! readResult = ReadRaw.readFromAllStream inMemStore ReadingDirection.Forward StartPosition.Start 10
+              let! readResult = ReadRaw.allForwards inMemStore StartPosition.Any 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
@@ -135,7 +135,7 @@ let tests =
               do! AppendRaw.appendNewMessage inMemStore stream2 appendVersion msg2
                   |> Async.Ignore
 
-              let! readResult = ReadRaw.readFromAllStream inMemStore ReadingDirection.Backward StartPosition.End 10
+              let! readResult = ReadRaw.allBackwards inMemStore StartPosition.Any 10
 
               readResult.Messages
               |> Array.sortBy (fun msg -> msg.MessageId)
