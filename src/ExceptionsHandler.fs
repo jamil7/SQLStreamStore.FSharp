@@ -1,9 +1,10 @@
 namespace SqlStreamStore.FSharp
 
 module ExceptionsHandler =
-    let asyncExceptionHandler (op: Async<'suc>): Async<Result<'suc, string>> =
-        op
+    /// Handles thrown exceptions from an async operation by wrapping them in a Result. 
+    let asyncExceptionHandler (asyncOperation: Async<'a>): Async<Result<'a, exn>> =
+        asyncOperation
         |> Async.Catch
         |> Async.map (function
             | Choice1Of2 response -> Ok response
-            | Choice2Of2 exn -> Error exn.Message)
+            | Choice2Of2 exn -> Error exn)
