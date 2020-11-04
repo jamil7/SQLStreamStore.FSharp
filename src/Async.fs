@@ -6,6 +6,7 @@ module Async =
 
     let map f m = async.Bind(m, (f >> async.Return))
 
+    /// A replacement for Async.AwaitTask that throws inner exceptions if they exist.
     let awaitTaskWithInnerException (task: Task<'T>): Async<'T> =
         Async.FromContinuations(fun (success, exception', _cancellationToken) ->
             task.ContinueWith(fun (t: Task<'T>) ->
@@ -19,6 +20,7 @@ module Async =
                     success t.Result)
             |> ignore)
 
+    /// A replacement for Async.AwaitTask that throws inner exceptions if they exist.
     let awaitTaskWithInnerException' (task: Task): Async<unit> =
         Async.FromContinuations(fun (success, exception', _cancellationToken) ->
             task.ContinueWith(fun (t: Task) ->
