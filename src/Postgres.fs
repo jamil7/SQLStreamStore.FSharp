@@ -11,7 +11,7 @@ type PostgresConfig =
       schema: string option }
 
 module Postgres =
-    let private storeSettings (config: PostgresConfig): string =
+    let private settingsStringFromConfig (config: PostgresConfig): string =
         sprintf
             "Host=%s;Port=%s;User Id=%s;Password=%s;Database=%s"
             config.host
@@ -40,7 +40,7 @@ module Postgres =
 
     /// Connects to a postgres database given a Npgsql configuration string and an optional schema.
     /// If no schema is provided the tables will be created directly in the public one.
-    let createStoreWithConfigString (config: string) (schema: string option): SqlStreamStore.PostgresStreamStore =
+    let connectWithConfigString (config: string) (schema: string option): SqlStreamStore.PostgresStreamStore =
         let storeSettings =
             SqlStreamStore.PostgresStreamStoreSettings(config)
             |> setSchema schema
