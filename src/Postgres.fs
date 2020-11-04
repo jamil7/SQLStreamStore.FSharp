@@ -11,7 +11,7 @@ type PostgresConfig =
       schema: string option }
 
 module Postgres =
-    let private settingsStringFromConfig (config: PostgresConfig): string =
+    let private storeSettings (config: PostgresConfig): string =
         sprintf
             "Host=%s;Port=%s;User Id=%s;Password=%s;Database=%s"
             config.host

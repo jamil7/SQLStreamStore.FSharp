@@ -15,3 +15,6 @@ Wrapping only the basic functionality, and sticking to the naming conventions in
 
 ## Not Supported functionality
 - Subscriptions aren't going to be supported. Wrapping them is more awkward than using C# in F#.
+
+## Disclaimer
+The library, while perfectly usable at this stage is still in alpha, which entails rapid breaking changes.
