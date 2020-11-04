@@ -21,6 +21,8 @@ module AppendRaw =
         | AppendVersion.NoStream -> ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
 
+    /// Appends a new message to a given stream.
+    /// Can throw exceptions.
     let appendNewMessage (store: SqlStreamStore.IStreamStore)
                          (streamName: string)
                          (appendVersion: AppendVersion)
@@ -34,7 +36,8 @@ module AppendRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
-
+    /// Appends a list of messages to a given stream.
+    /// Can throw exceptions.
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
                           (streamName: string)
                           (appendVersion: AppendVersion)
