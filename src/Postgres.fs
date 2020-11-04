@@ -7,16 +7,11 @@ type PostgresConfig =
       port: string
       username: string
       password: string
-      database: string }
-
-type PoolingConfig =
-    { minPoolSize: int option
-      maxPoolSize: int option
-      connectionIdleLifeTime: int option
-      connectionPruningInterval: int option }
+      database: string
+      schema: string option }
 
 module Postgres =
-    let private storeSettings (config: PostgresConfig): string =
+    let private settingsStringFromConfig (config: PostgresConfig): string =
         sprintf
             "Host=%s;Port=%s;User Id=%s;Password=%s;Database=%s"
             config.host
@@ -25,47 +20,42 @@ module Postgres =
             config.password
             config.database
 
-    let private poolingSettings (pooling: PoolingConfig): string =
-        let minSize =
-            pooling.minPoolSize |> Option.defaultValue 0
+    let private setSchema (schema: string option)
+                          (settings: SqlStreamStore.PostgresStreamStoreSettings)
+                          : SqlStreamStore.PostgresStreamStoreSettings =
+        match schema with
+        | None -> ()
+        | Some schema -> settings.Schema <- schema
 
-        let maxSize =
-            pooling.maxPoolSize |> Option.defaultValue 100
+        settings
 
-        let connectionPruningInterval =
-            pooling.connectionPruningInterval
-            |> Option.defaultValue 300
+    /// Connects to a postgres database given a configuration record and an optional schema.
+    /// If no schema is provided the tables will be created directly in the public one.
+    let connect (config: PostgresConfig) (schema: string option): SqlStreamStore.PostgresStreamStore =
+        let storeSettings =
+            SqlStreamStore.PostgresStreamStoreSettings(settingsStringFromConfig config)
+            |> setSchema schema
 
-        let connectionIdleLifeTime =
-            pooling.connectionIdleLifeTime
-            |> Option.defaultValue 10
+        new SqlStreamStore.PostgresStreamStore(storeSettings)
 
-        sprintf
-            "Minimum Pool Size=%d;Maximum Pool Size=%d;Connection Idle Lifetime=%d;Connection Pruning Interval%d"
-            minSize
-            maxSize
-            connectionPruningInterval
-            connectionIdleLifeTime
+    /// Connects to a postgres database given a Npgsql configuration string and an optional schema.
+    /// If no schema is provided the tables will be created directly in the public one.
+    let createStoreWithConfigString (config: string) (schema: string option): SqlStreamStore.PostgresStreamStore =
+        let storeSettings =
+            SqlStreamStore.PostgresStreamStoreSettings(config)
+            |> setSchema schema
 
-    let private storeSettingsWithPooling (config: PostgresConfig) (pooling: PoolingConfig): string =
-        sprintf "%s;%s" (storeSettings config) (poolingSettings pooling)
+        new SqlStreamStore.PostgresStreamStore(storeSettings)
 
-    let createStore (config: PostgresConfig): SqlStreamStore.PostgresStreamStore =
-        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(storeSettings config))
-
-    let createStoreWithPoolingConfig (config: PostgresConfig) (pooling: PoolingConfig): SqlStreamStore.PostgresStreamStore =
-        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings
-                                                   (storeSettingsWithPooling config pooling))
-
-    let createStoreWithConfigString (config: string): SqlStreamStore.PostgresStreamStore =
-        new SqlStreamStore.PostgresStreamStore(SqlStreamStore.PostgresStreamStoreSettings(config))
-
+    /// Creates messages, and streams tables that house the data.
+    /// Can throw exceptions.
     let createSchemaRaw (store: SqlStreamStore.PostgresStreamStore): Async<unit> =
         async {
             return! store.CreateSchemaIfNotExists()
                     |> Async.awaitTaskWithInnerException'
         }
 
-    let createSchema (store: SqlStreamStore.PostgresStreamStore): Async<Result<unit, string>> =
+    /// Creates messages, and streams tables that house the data.
+    let createSchema (store: SqlStreamStore.PostgresStreamStore): Async<Result<unit, exn>> =
         createSchemaRaw store
         |> ExceptionsHandler.asyncExceptionHandler
