@@ -3,7 +3,7 @@ namespace SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 module Append =
-    /// Appends a new message to a given stream.
+    /// Appends a new message to a specific stream.
     let appendNewMessage (store: SqlStreamStore.IStreamStore)
                          (streamName: string)
                          (appendVersion: AppendVersion)
@@ -12,7 +12,7 @@ module Append =
         AppendRaw.appendNewMessage store streamName appendVersion messageDetails
         |> ExceptionsHandler.asyncExceptionHandler 
 
-    /// Appends a list of messages to a given stream.
+    /// Appends a list of messages to a specific stream.
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
                           (streamName: string)
                           (appendVersion: AppendVersion)
