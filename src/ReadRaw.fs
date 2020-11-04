@@ -75,11 +75,10 @@ module ReadRaw =
     let allForwardsPrefetch (store: SqlStreamStore.IStreamStore)
                             (startPositionInclusive: StartPosition)
                             (msgCount: int)
-                            (prefetchJson: bool)
                             : Async<ReadAllPage> =
         async {
             return! store.ReadAllForwards
-                        (fromStartPositionInclusiveForwards startPositionInclusive, msgCount, prefetchJson)
+                        (fromStartPositionInclusiveForwards startPositionInclusive, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
@@ -88,11 +87,10 @@ module ReadRaw =
     let allBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
                              (startPositionInclusive: StartPosition)
                              (msgCount: int)
-                             (prefetchJson: bool)
                              : Async<ReadAllPage> =
         async {
             return! store.ReadAllBackwards
-                        (fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, prefetchJson)
+                        (fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
@@ -102,11 +100,10 @@ module ReadRaw =
                                (streamName: string)
                                (readVersion: ReadVersion)
                                (msgCount: int)
-                               (prefetchJson: bool)
                                : Async<ReadStreamPage> =
         async {
             return! store.ReadStreamForwards
-                        (StreamId(streamName), fromReadVersionForwards readVersion, msgCount, prefetchJson)
+                        (StreamId(streamName), fromReadVersionForwards readVersion, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
@@ -116,11 +113,10 @@ module ReadRaw =
                                 (streamName: string)
                                 (readVersion: ReadVersion)
                                 (msgCount: int)
-                                (prefetchJson: bool)
                                 : Async<ReadStreamPage> =
         async {
             return! store.ReadStreamBackwards
-                        (StreamId(streamName), fromReadVersionBackwards readVersion, msgCount, prefetchJson)
+                        (StreamId(streamName), fromReadVersionBackwards readVersion, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
