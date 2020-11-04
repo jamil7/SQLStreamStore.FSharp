@@ -24,6 +24,8 @@ module ReadRaw =
         | StartPosition.Any -> -1L
         | StartPosition.SpecificPosition position -> position
 
+    /// Read forwards from the all stream.
+    /// Can throw exceptions.
     let allForwards (store: SqlStreamStore.IStreamStore)
                     (startPositionInclusive: StartPosition)
                     (msgCount: int)
@@ -33,6 +35,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read backwards from the all stream.
+    /// Can throw exceptions.
     let allBackwards (store: SqlStreamStore.IStreamStore)
                      (startPositionInclusive: StartPosition)
                      (msgCount: int)
@@ -42,6 +46,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read forwards from a specific stream.
+    /// Can throw exceptions.
     let streamForwards (store: SqlStreamStore.IStreamStore)
                        (streamName: string)
                        (readVersion: ReadVersion)
@@ -52,6 +58,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read backwards from a specific stream.
+    /// Can throw exceptions.
     let streamBackwards (store: SqlStreamStore.IStreamStore)
                         (streamName: string)
                         (readVersion: ReadVersion)
@@ -62,6 +70,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read forwards from the all stream, prefetching the messages' jsonData.
+    /// Can throw exceptions.
     let allForwardsPrefetch (store: SqlStreamStore.IStreamStore)
                             (startPositionInclusive: StartPosition)
                             (msgCount: int)
@@ -73,6 +83,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read backwards from the all stream, prefetching the messages' jsonData.
+    /// Can throw exceptions.
     let allBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
                              (startPositionInclusive: StartPosition)
                              (msgCount: int)
@@ -84,6 +96,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read forwards from a specific stream, prefetching the messages' jsonData.
+    /// Can throw exceptions.
     let streamForwardsPrefetch (store: SqlStreamStore.IStreamStore)
                                (streamName: string)
                                (readVersion: ReadVersion)
@@ -96,6 +110,8 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
+    /// Read backwards from a specific stream, prefetching the messages' jsonData.
+    /// Can throw exceptions.
     let streamBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
                                 (streamName: string)
                                 (readVersion: ReadVersion)
@@ -108,12 +124,15 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
-    let allForwards' (store: SqlStreamStore.IStreamStore)
-                     (startPositionInclusive: StartPosition)
-                     (msgCount: int)
-                     (prefetchJson: bool)
-                     (cancellationToken: CancellationToken)
-                     : Async<ReadAllPage> =
+    /// Read forwards from the all stream, prefetching the messages' jsonData.
+    /// Needs a cancellation token.
+    /// Can throw exceptions.
+    let allForwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
+                                            (startPositionInclusive: StartPosition)
+                                            (msgCount: int)
+                                            (prefetchJson: bool)
+                                            (cancellationToken: CancellationToken)
+                                            : Async<ReadAllPage> =
         async {
             return! store.ReadAllForwards
                         (fromStartPositionInclusiveForwards startPositionInclusive,
@@ -123,51 +142,46 @@ module ReadRaw =
                     |> Async.awaitTaskWithInnerException
         }
 
-    let allBackwards' (store: SqlStreamStore.IStreamStore)
-                      (startPositionInclusive: StartPosition)
-                      (msgCount: int)
-                      (prefetchJson: bool)
-                      (cancellationToken: CancellationToken)
-                      : Async<ReadAllPage> =
+    /// Read forwards from the all stream, prefetching the messages' jsonData.
+    /// Needs a cancellation token.
+    /// Can throw exceptions.
+    let allBackwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
+                                             (startPositionInclusive: StartPosition)
+                                             (msgCount: int)
+                                             (cancellationToken: CancellationToken)
+                                             : Async<ReadAllPage> =
         async {
             return! store.ReadAllBackwards
-                        (fromStartPositionInclusiveBackwards startPositionInclusive,
-                         msgCount,
-                         prefetchJson,
-                         cancellationToken)
+                        (fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, true, cancellationToken)
                     |> Async.awaitTaskWithInnerException
         }
 
-    let streamForwards' (store: SqlStreamStore.IStreamStore)
-                        (streamName: string)
-                        (readVersion: ReadVersion)
-                        (msgCount: int)
-                        (prefetchJson: bool)
-                        (cancellationToken: CancellationToken)
-                        : Async<ReadStreamPage> =
+    /// Read forwards from a specific stream, prefetching the messages' jsonData.
+    /// Needs a cancellation token.
+    /// Can throw exceptions.
+    let streamForwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
+                                               (streamName: string)
+                                               (readVersion: ReadVersion)
+                                               (msgCount: int)
+                                               (cancellationToken: CancellationToken)
+                                               : Async<ReadStreamPage> =
         async {
             return! store.ReadStreamForwards
-                        (StreamId(streamName),
-                         fromReadVersionForwards readVersion,
-                         msgCount,
-                         prefetchJson,
-                         cancellationToken)
+                        (StreamId(streamName), fromReadVersionForwards readVersion, msgCount, true, cancellationToken)
                     |> Async.awaitTaskWithInnerException
         }
 
-    let streamBackwards' (store: SqlStreamStore.IStreamStore)
-                         (streamName: string)
-                         (readVersion: ReadVersion)
-                         (msgCount: int)
-                         (prefetchJson: bool)
-                         (cancellationToken: CancellationToken)
-                         : Async<ReadStreamPage> =
+    /// Read backwards from a specific stream, prefetching the messages' jsonData.
+    /// Needs a cancellation token.
+    /// Can throw exceptions.
+    let streamBackwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
+                                                (streamName: string)
+                                                (readVersion: ReadVersion)
+                                                (msgCount: int)
+                                                (cancellationToken: CancellationToken)
+                                                : Async<ReadStreamPage> =
         async {
             return! store.ReadStreamBackwards
-                        (StreamId(streamName),
-                         fromReadVersionBackwards readVersion,
-                         msgCount,
-                         prefetchJson,
-                         cancellationToken)
+                        (StreamId(streamName), fromReadVersionBackwards readVersion, msgCount, true, cancellationToken)
                     |> Async.awaitTaskWithInnerException
         }
