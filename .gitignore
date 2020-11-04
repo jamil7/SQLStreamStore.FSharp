@@ -12,3 +12,5 @@ tests/obj
 
 Release/
 site/
+
+mkdocs.yml
