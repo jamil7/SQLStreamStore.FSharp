@@ -77,8 +77,7 @@ module ReadRaw =
                             (msgCount: int)
                             : Async<ReadAllPage> =
         async {
-            return! store.ReadAllForwards
-                        (fromStartPositionInclusiveForwards startPositionInclusive, msgCount, true)
+            return! store.ReadAllForwards(fromStartPositionInclusiveForwards startPositionInclusive, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
@@ -89,8 +88,7 @@ module ReadRaw =
                              (msgCount: int)
                              : Async<ReadAllPage> =
         async {
-            return! store.ReadAllBackwards
-                        (fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, true)
+            return! store.ReadAllBackwards(fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
@@ -102,8 +100,7 @@ module ReadRaw =
                                (msgCount: int)
                                : Async<ReadStreamPage> =
         async {
-            return! store.ReadStreamForwards
-                        (StreamId(streamName), fromReadVersionForwards readVersion, msgCount, true)
+            return! store.ReadStreamForwards(StreamId(streamName), fromReadVersionForwards readVersion, msgCount, true)
                     |> Async.awaitTaskWithInnerException
         }
 
