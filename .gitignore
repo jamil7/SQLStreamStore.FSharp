@@ -5,10 +5,8 @@
 .ionide
 .DS_Store
 
-src/bin
-src/obj
-tests/bin
-tests/obj
+/bin
+/obj
 
 Release/
 site/
