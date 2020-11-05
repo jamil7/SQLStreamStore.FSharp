@@ -5,8 +5,8 @@
 .ionide
 .DS_Store
 
-/bin
-/obj
+*/bin
+*/obj
 
 Release/
 site/
