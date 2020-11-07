@@ -20,6 +20,7 @@
         <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
+        <Compile Include="Get.fs" />
     </ItemGroup>
 
     <ItemGroup>
