@@ -6,7 +6,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="GetJsonData.fs" />
     <Compile Include="Program.fs" />
+    <Content Include="Dockerfile" />
+    <Content Include="init-user-db.sh" />
+    <Content Include="docker-compse.yaml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="5.0.0" />
+    <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+    <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\SqlStreamStore.FSharp.fsproj" />
+  </ItemGroup>
+  
 </Project>
