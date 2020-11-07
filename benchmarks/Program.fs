@@ -1,10 +1,20 @@
 ﻿namespace SqlStreamStore.FSharp.Benchmarks
 
 open SqlStreamStore
+open SqlStreamStore.Streams
 open SqlStreamStore.FSharp
 open SqlStreamStore.FSharp.Postgres
 
 module AppendTestMessages =
+    let appendImpure (store: IStreamStore) streamName (messages: MessageDetails list) =
+        store.AppendToStream
+            (StreamId(streamName),
+             ExpectedVersion.Any,
+             messages
+             |> List.map (fun msg -> NewStreamMessage(System.Guid.NewGuid(), msg.type_, msg.jsonData))
+             |> List.toArray)
+        |> Async.awaitTaskWithInnerException
+
     let workflow (store: IStreamStore): Async<Streams.AppendResult> =
         [ 0 .. 400000 ]
         |> List.map (fun msg ->
@@ -13,7 +23,9 @@ module AppendTestMessages =
               type_ = "test-event"
               jsonData = sprintf "%d" msg
               jsonMetadata = "{}" })
-        |> AppendRaw.appendNewMessages store "test" AppendVersion.Any
+        |> appendImpure store "test"
+
+
 
 module Main =
     [<EntryPoint>]
@@ -33,10 +45,12 @@ module Main =
         Postgres.createSchemaRaw conn
         |> Async.RunSynchronously
 
-//        printfn "Appending messages..."
-//        AppendTestMessages.workflow store
-//        |> Async.RunSynchronously
-//        |> ignore
+        printfn "Appending messages..."
+        let start0 = System.DateTime.Now
+        AppendTestMessages.workflow store
+        |> Async.RunSynchronously
+        |> ignore
+        let duration0 = System.DateTime.Now - start0
 
         printfn "Fetching no prefetch..."
         let start1 = System.DateTime.Now
@@ -58,6 +72,7 @@ module Main =
 
         let duration2 = System.DateTime.Now - start2
 
-//        printfn "No prefetch: %d messages in %A" len1 duration1
+        printfn "Appended messages in: %A" duration0
+        printfn "No prefetch: %d messages in %A" len1 duration1
         printfn "With prefetch: %d messages in %A" len2 duration2
         0 // return an integer exit code
