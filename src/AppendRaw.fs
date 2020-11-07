@@ -11,7 +11,8 @@ module AppendRaw =
 
     let private newStreamMessageFromMessageDetails (msg: MessageDetails): NewStreamMessage =
         match msg.jsonMetadata with
-        | "" -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData)
+        | ""
+        | "{}" -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData)
         | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type_, msg.jsonData, metadata)
 
     let private fromAppendVersion: AppendVersion -> int =
