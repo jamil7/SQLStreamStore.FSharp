@@ -49,6 +49,7 @@ module Postgres =
 
     /// Creates messages, and streams tables that house the data.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to createMessage instead.
     let createSchemaRaw (store: SqlStreamStore.PostgresStreamStore): Async<unit> =
         async {
             return! store.CreateSchemaIfNotExists()
