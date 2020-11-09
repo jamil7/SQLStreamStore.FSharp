@@ -21,6 +21,7 @@
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
         <Compile Include="GetRaw.fs" />
+        <Compile Include="Get.fs" />
     </ItemGroup>
 
     <ItemGroup>
