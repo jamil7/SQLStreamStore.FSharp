@@ -4,10 +4,10 @@ module Async =
 
     open System.Threading.Tasks
 
-    /// Bind operator for Async
+    /// Bind operator for Async.
     let bind f m = async.Bind(m,f)
     
-    /// Map operator for Async
+    /// Map operator for Async.
     let map f m = bind (f >> async.Return) m
 
     /// Evaluates a sequence of async operations returning a list of results.
