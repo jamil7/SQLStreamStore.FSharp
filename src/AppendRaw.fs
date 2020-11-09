@@ -24,6 +24,7 @@ module AppendRaw =
 
     /// Appends a new message to a given stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Append module's functions.
     let appendNewMessage (store: SqlStreamStore.IStreamStore)
                          (streamName: string)
                          (appendVersion: AppendVersion)
@@ -39,6 +40,7 @@ module AppendRaw =
 
     /// Appends a list of messages to a given stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Append module's functions.
     let appendNewMessages (store: SqlStreamStore.IStreamStore)
                           (streamName: string)
                           (appendVersion: AppendVersion)

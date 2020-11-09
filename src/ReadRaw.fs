@@ -26,6 +26,7 @@ module ReadRaw =
 
     /// Read forwards from the all stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let allForwards (store: SqlStreamStore.IStreamStore)
                     (startPositionInclusive: StartPosition)
                     (msgCount: int)
@@ -37,6 +38,7 @@ module ReadRaw =
 
     /// Read backwards from the all stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let allBackwards (store: SqlStreamStore.IStreamStore)
                      (startPositionInclusive: StartPosition)
                      (msgCount: int)
@@ -48,6 +50,7 @@ module ReadRaw =
 
     /// Read forwards from a specific stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let streamForwards (store: SqlStreamStore.IStreamStore)
                        (streamName: string)
                        (readVersion: ReadVersion)
@@ -60,6 +63,7 @@ module ReadRaw =
 
     /// Read backwards from a specific stream.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let streamBackwards (store: SqlStreamStore.IStreamStore)
                         (streamName: string)
                         (readVersion: ReadVersion)
@@ -72,6 +76,7 @@ module ReadRaw =
 
     /// Read forwards from the all stream, prefetching the messages' jsonData.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let allForwardsPrefetch (store: SqlStreamStore.IStreamStore)
                             (startPositionInclusive: StartPosition)
                             (msgCount: int)
@@ -83,6 +88,7 @@ module ReadRaw =
 
     /// Read backwards from the all stream, prefetching the messages' jsonData.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let allBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
                              (startPositionInclusive: StartPosition)
                              (msgCount: int)
@@ -94,6 +100,7 @@ module ReadRaw =
 
     /// Read forwards from a specific stream, prefetching the messages' jsonData.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let streamForwardsPrefetch (store: SqlStreamStore.IStreamStore)
                                (streamName: string)
                                (readVersion: ReadVersion)
@@ -106,6 +113,7 @@ module ReadRaw =
 
     /// Read backwards from a specific stream, prefetching the messages' jsonData.
     /// Can throw exceptions.
+    /// Not recommended to use. Refer to Read module's functions.
     let streamBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
                                 (streamName: string)
                                 (readVersion: ReadVersion)
@@ -120,6 +128,7 @@ module ReadRaw =
     /// Read forwards from the all stream, prefetching the messages' jsonData.
     /// Needs a cancellation token.
     /// Can throw exceptions.
+    /// Not recommended to use. 
     let allForwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
                                             (startPositionInclusive: StartPosition)
                                             (msgCount: int)
@@ -138,6 +147,7 @@ module ReadRaw =
     /// Read forwards from the all stream, prefetching the messages' jsonData.
     /// Needs a cancellation token.
     /// Can throw exceptions.
+    /// Not recommended to use.
     let allBackwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
                                              (startPositionInclusive: StartPosition)
                                              (msgCount: int)
@@ -152,6 +162,7 @@ module ReadRaw =
     /// Read forwards from a specific stream, prefetching the messages' jsonData.
     /// Needs a cancellation token.
     /// Can throw exceptions.
+    /// Not recommended to use.
     let streamForwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
                                                (streamName: string)
                                                (readVersion: ReadVersion)
@@ -167,6 +178,7 @@ module ReadRaw =
     /// Read backwards from a specific stream, prefetching the messages' jsonData.
     /// Needs a cancellation token.
     /// Can throw exceptions.
+    /// Not recommended to use.
     let streamBackwardsPrefetchWithCancellation (store: SqlStreamStore.IStreamStore)
                                                 (streamName: string)
                                                 (readVersion: ReadVersion)
