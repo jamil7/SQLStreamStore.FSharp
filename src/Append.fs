@@ -5,8 +5,8 @@ open SqlStreamStore.Streams
 open FSharp.Prelude
 
 module Append =
-    let private stringIdToGuid: StreamMessageId -> System.Guid =
-        function
+    let private stringIdToGuid (streamMessageId: StreamMessageId): System.Guid =
+        match streamMessageId with
         | StreamMessageId.Custom guid -> guid
         | StreamMessageId.Auto -> System.Guid.NewGuid()
 
@@ -16,8 +16,8 @@ module Append =
         | "{}" -> NewStreamMessage(stringIdToGuid msg.id, msg.type', msg.jsonData)
         | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type', msg.jsonData, metadata)
 
-    let private fromAppendVersion: AppendVersion -> int =
-        function
+    let private fromAppendVersion (appendVersion: AppendVersion): int =
+        match appendVersion with
         | AppendVersion.Any -> ExpectedVersion.Any
         | AppendVersion.EmptyStream -> ExpectedVersion.EmptyStream
         | AppendVersion.NoStream -> ExpectedVersion.NoStream
