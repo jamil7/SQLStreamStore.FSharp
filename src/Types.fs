@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-[<RequireQualifiedAccessAttribute>]
+[<RequireQualifiedAccess>]
 type StreamMessageId =
     | Custom of System.Guid
     | Auto
@@ -11,19 +11,19 @@ type MessageDetails =
       jsonData: string
       jsonMetadata: string }
 
-[<RequireQualifiedAccessAttribute>]
+[<RequireQualifiedAccess>]
 type AppendVersion =
     | Any
     | EmptyStream
     | NoStream
     | SpecificVersion of int
 
-[<RequireQualifiedAccessAttribute>]
+[<RequireQualifiedAccess>]
 type ReadVersion =
     | Any
     | SpecificVersion of uint
 
-[<RequireQualifiedAccessAttribute>]
+[<RequireQualifiedAccess>]
 type StartPosition =
     | Any
     | SpecificPosition of int64
