@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp.Postgres
 
-open SqlStreamStore.FSharp
+open FSharp.Prelude
 
 type PostgresConfig =
     { host: string
@@ -48,14 +48,7 @@ module Postgres =
         new SqlStreamStore.PostgresStreamStore(storeSettings)
 
     /// Creates messages, and streams tables that house the data.
-    /// Can throw exceptions.
-    let createSchemaRaw (store: SqlStreamStore.PostgresStreamStore): Async<unit> =
-        async {
+    let createSchema (store: SqlStreamStore.PostgresStreamStore): AsyncResult<unit, exn> =
+        asyncResult {
             return! store.CreateSchemaIfNotExists()
-                    |> Async.awaitTaskWithInnerException'
         }
-
-    /// Creates messages, and streams tables that house the data.
-    let createSchema (store: SqlStreamStore.PostgresStreamStore): Async<Result<unit, exn>> =
-        createSchemaRaw store
-        |> ExceptionsHandler.asyncExceptionHandler
