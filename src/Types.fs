@@ -7,7 +7,7 @@ type StreamMessageId =
 
 type MessageDetails =
     { id: StreamMessageId
-      type_: string
+      type': string
       jsonData: string
       jsonMetadata: string }
 
