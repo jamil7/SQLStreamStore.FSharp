@@ -5,13 +5,13 @@ open SqlStreamStore.Streams
 open FSharp.Prelude
 
 module Read =
-    let private fromReadVersionForwards: ReadVersion -> int =
-        function
+    let private fromReadVersionForwards (readVersion: ReadVersion): int =
+        match readVersion with
         | ReadVersion.Any -> int (Position.Start)
         | ReadVersion.SpecificVersion version -> int (version)
 
-    let private fromReadVersionBackwards: ReadVersion -> int =
-        function
+    let private fromReadVersionBackwards (readVersion: ReadVersion): int =
+        match readVersion with
         | ReadVersion.Any -> int (Position.End)
         | ReadVersion.SpecificVersion version -> int (version)
 
