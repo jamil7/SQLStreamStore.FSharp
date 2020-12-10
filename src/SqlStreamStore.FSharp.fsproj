@@ -12,7 +12,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="ExceptionsHandler.fs" />
         <Compile Include="Types.fs" />
         <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
