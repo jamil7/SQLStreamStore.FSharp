@@ -2,6 +2,7 @@ namespace SqlStreamStore.FSharp
 
 open SqlStreamStore
 open SqlStreamStore.Streams
+open SqlStreamStore.FSharp.Types
 open FSharp.Prelude
 
 module Append =
@@ -23,7 +24,7 @@ module Append =
         | AppendVersion.NoStream -> ExpectedVersion.NoStream
         | AppendVersion.SpecificVersion version -> version
 
-    let append (store: IStreamStore) (stream: string) (appendVersion: AppendVersion) (messages: MessageDetails list) =
+    let messages (store: IStreamStore) (stream: string) (appendVersion: AppendVersion) (messages: MessageDetails list) =
         asyncResult {
             return! store.AppendToStream
                         (StreamId(stream),

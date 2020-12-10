@@ -1,9 +1,9 @@
-namespace SqlStreamStore.FSharp
+namespace SqlStreamStore.FSharp.Types
 
 [<RequireQualifiedAccess>]
 type StreamMessageId =
-    | Custom of System.Guid
     | Auto
+    | Custom of System.Guid
 
 type MessageDetails =
     { id: StreamMessageId
