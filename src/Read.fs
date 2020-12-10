@@ -1,72 +1,32 @@
 namespace SqlStreamStore.FSharp
 
+open SqlStreamStore
 open SqlStreamStore.Streams
+open FSharp.Prelude
 
 module Read =
-    /// Read forwards from the all stream.
-    let allForwards (store: SqlStreamStore.IStreamStore)
-                    (startPositionInclusive: StartPosition)
-                    (msgCount: int)
-                    : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allForwards store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let private fromReadVersionForwards: ReadVersion -> int =
+        function
+        | ReadVersion.Any -> int (Position.Start)
+        | ReadVersion.SpecificVersion version -> int (version)
 
-    /// Read backwards from the all stream.
-    let allBackwards (store: SqlStreamStore.IStreamStore)
-                     (startPositionInclusive: StartPosition)
-                     (msgCount: int)
-                     : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allBackwards store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let private fromReadVersionBackwards: ReadVersion -> int =
+        function
+        | ReadVersion.Any -> int (Position.End)
+        | ReadVersion.SpecificVersion version -> int (version)
 
-    /// Read forwards from a specific stream.
-    let streamForwards (store: SqlStreamStore.IStreamStore)
-                       (streamName: string)
-                       (readVersion: ReadVersion)
-                       (msgCount: int)
-                       : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamForwards store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let readForwards (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
+        asyncResult {
+            return! store.ReadStreamForwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount) }
 
-    /// Read backwards from a specific stream.
-    let streamBackwards (store: SqlStreamStore.IStreamStore)
-                        (streamName: string)
-                        (readVersion: ReadVersion)
-                        (msgCount: int)
-                        : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamBackwards store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let readBackwards (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
+        asyncResult {
+            return! store.ReadStreamBackwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount) }
 
-    /// Read forwards from the all stream, prefetching the messages' jsonData.
-    let allForwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                            (startPositionInclusive: StartPosition)
-                            (msgCount: int)
-                            : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allForwardsPrefetch store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let readForwardsPrefetch (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
+        asyncResult {
+            return! store.ReadStreamForwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount, true) }
 
-    /// Read backwards from the all stream, prefetching the messages' jsonData.
-    let allBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                             (startPositionInclusive: StartPosition)
-                             (msgCount: int)
-                             : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allBackwardsPrefetch store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
-
-    /// Read forwards from a specific stream, prefetching the messages' jsonData.
-    let streamForwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                               (streamName: string)
-                               (readVersion: ReadVersion)
-                               (msgCount: int)
-                               : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamForwardsPrefetch store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
-
-    /// Read backwards from a specific stream, prefetching the messages' jsonData.
-    let streamBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                                (streamName: string)
-                                (readVersion: ReadVersion)
-                                (msgCount: int)
-                                : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamBackwardsPrefetch store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let readBackwardsPrefetch (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
+        asyncResult {
+            return! store.ReadStreamBackwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount, true) }

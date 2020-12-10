@@ -1,22 +1,34 @@
 namespace SqlStreamStore.FSharp
 
+open SqlStreamStore
 open SqlStreamStore.Streams
+open FSharp.Prelude
 
 module Append =
-    /// Appends a new message to a specific stream.
-    let appendNewMessage (store: SqlStreamStore.IStreamStore)
-                         (streamName: string)
-                         (appendVersion: AppendVersion)
-                         (messageDetails: MessageDetails)
-                         : Async<Result<AppendResult, exn>> =
-        AppendRaw.appendNewMessage store streamName appendVersion messageDetails
-        |> ExceptionsHandler.asyncExceptionHandler 
+    let private stringIdToGuid: StreamMessageId -> System.Guid =
+        function
+        | StreamMessageId.Custom guid -> guid
+        | StreamMessageId.Auto -> System.Guid.NewGuid()
 
-    /// Appends a list of messages to a specific stream.
-    let appendNewMessages (store: SqlStreamStore.IStreamStore)
-                          (streamName: string)
-                          (appendVersion: AppendVersion)
-                          (messages: MessageDetails list)
-                          : Async<Result<AppendResult, exn>> =
-        AppendRaw.appendNewMessages store streamName appendVersion messages
-        |> ExceptionsHandler.asyncExceptionHandler 
+    let private newStreamMessageFromMessageDetails (msg: MessageDetails): NewStreamMessage =
+        match msg.jsonMetadata with
+        | ""
+        | "{}" -> NewStreamMessage(stringIdToGuid msg.id, msg.type', msg.jsonData)
+        | metadata -> NewStreamMessage(stringIdToGuid msg.id, msg.type', msg.jsonData, metadata)
+
+    let private fromAppendVersion: AppendVersion -> int =
+        function
+        | AppendVersion.Any -> ExpectedVersion.Any
+        | AppendVersion.EmptyStream -> ExpectedVersion.EmptyStream
+        | AppendVersion.NoStream -> ExpectedVersion.NoStream
+        | AppendVersion.SpecificVersion version -> version
+
+    let append (store: IStreamStore) (stream: string) (appendVersion: AppendVersion) (messages: MessageDetails list) =
+        asyncResult {
+            return! store.AppendToStream
+                        (StreamId(stream),
+                         fromAppendVersion appendVersion,
+                         messages
+                         |> List.map newStreamMessageFromMessageDetails
+                         |> List.toArray)
+        }

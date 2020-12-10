@@ -12,11 +12,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Async.fs" />
         <Compile Include="ExceptionsHandler.fs" />
         <Compile Include="Types.fs" />
-        <Compile Include="AppendRaw.fs" />
-        <Compile Include="ReadRaw.fs" />
         <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
@@ -24,6 +21,7 @@
 
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="5.0.0" />
+        <PackageReference Include="FSharp.Prelude" Version="2.2.0" />
         <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
         <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
