@@ -16,7 +16,7 @@ module AllStreamController =
         | (ReadDirection.Backward, true) -> ReadAll.backwardsPrefetch store startPosition messageCount
         | _ -> Async.singleton (Error IllegalArgumentException)
 
-    type StreamController(store: SqlStreamStore.IStreamStore) =
+    type AllStreamController(store: SqlStreamStore.IStreamStore) =
         inherit AbstractAllStreamController()
 
         override this.direction(?readDirection: ReadDirection,
