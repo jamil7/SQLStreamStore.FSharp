@@ -7,14 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="AppendRawTests.fs" />
-        <Compile Include="AppendTests.fs" />
-        <Compile Include="ReadRawTests.fs" />
-        <Compile Include="ReadTests.fs" />
-        <Compile Include="Program.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="5.0.0" />
         <PackageReference Include="Expecto" Version="9.*" />
         <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
