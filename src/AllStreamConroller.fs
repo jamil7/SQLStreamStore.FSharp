@@ -17,7 +17,7 @@ module AllStreamController =
         | _ -> Async.singleton (Error IllegalArgumentException)
 
     type StreamController(store: SqlStreamStore.IStreamStore) =
-        inherit AbstractAllStreamController<StartPosition>()
+        inherit AbstractAllStreamController()
 
         override this.direction(?readDirection: ReadDirection,
                                 ?startPosition: StartPosition,
@@ -34,7 +34,6 @@ module AllStreamController =
             let prefetch' = defaultArg prefetch false
             asyncResult {
                 let! readPage = allStreamReadMatcher readDirection' prefetch' store startPosition' messageCount'
-
                 return readPage.Direction
             }
 
@@ -53,7 +52,6 @@ module AllStreamController =
             let prefetch' = defaultArg prefetch false
             asyncResult {
                 let! readPage = allStreamReadMatcher readDirection' prefetch' store startPosition' messageCount'
-
                 return readPage.FromPosition
             }
 
@@ -72,7 +70,6 @@ module AllStreamController =
             let prefetch' = defaultArg prefetch false
             asyncResult {
                 let! readPage = allStreamReadMatcher readDirection' prefetch' store startPosition' messageCount'
-
                 return readPage.IsEnd
             }
 
@@ -91,7 +88,6 @@ module AllStreamController =
             let prefetch' = defaultArg prefetch false
             asyncResult {
                 let! readPage = allStreamReadMatcher readDirection' prefetch' store startPosition' messageCount'
-
                 return readPage.NextPosition
             }
 
@@ -115,7 +111,6 @@ module AllStreamController =
             let messages =
                 asyncResult {
                     let! readPage = allStreamReadMatcher readDirection' prefetch' store startPosition' messageCount'
-
                     return List.ofArray readPage.Messages
                 }
 

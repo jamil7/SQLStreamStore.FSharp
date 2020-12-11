@@ -17,7 +17,7 @@
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
         <Compile Include="StreamMessages.fs" />
-        <Compile Include="AbstractStreamContollers.fs" />
+        <Compile Include="AbstractContollers.fs" />
         <Compile Include="StreamController.fs" />
         <Compile Include="AllStreamConroller.fs" />
     </ItemGroup>
