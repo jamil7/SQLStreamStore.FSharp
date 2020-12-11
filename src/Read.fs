@@ -18,11 +18,11 @@ module ReadStream =
 
     let forwards (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
         asyncResult {
-            return! store.ReadStreamForwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount) }
+            return! store.ReadStreamForwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount, false) }
 
     let backwards (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
         asyncResult {
-            return! store.ReadStreamBackwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount) }
+            return! store.ReadStreamBackwards(StreamId(stream), fromReadVersionForwards readVersion, msgCount, false) }
 
     let forwardsPrefetch (store: IStreamStore) (stream: string) (readVersion: ReadVersion) (msgCount: int) =
         asyncResult {
@@ -55,11 +55,11 @@ module ReadAll =
 
     let forwards (store: IStreamStore) (startPositionInclusive: StartPosition) (msgCount: int) =
         asyncResult {
-            return! store.ReadAllForwards(fromStartPositionInclusiveForwards startPositionInclusive, msgCount) }
+            return! store.ReadAllForwards(fromStartPositionInclusiveForwards startPositionInclusive, msgCount, false) }
 
     let backwards (store: IStreamStore) (startPositionInclusive: StartPosition) (msgCount: int) =
         asyncResult {
-            return! store.ReadAllBackwards(fromStartPositionInclusiveBackwards startPositionInclusive, msgCount) }
+            return! store.ReadAllBackwards(fromStartPositionInclusiveBackwards startPositionInclusive, msgCount, false) }
 
     let forwardsPrefetch (store: IStreamStore) (startPositionInclusive: StartPosition) (msgCount: int) =
         asyncResult {
