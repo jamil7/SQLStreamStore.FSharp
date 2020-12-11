@@ -3,7 +3,6 @@ namespace SqlStreamStore.FSharp
 open FSharp.Prelude
 open SqlStreamStore.FSharp.Types
 open SqlStreamStore.Streams
-open SqlStreamStore.Streams
 
 exception IllegalArgumentException
 

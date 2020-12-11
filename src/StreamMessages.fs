@@ -1,8 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open System.Threading.Tasks
 open FSharp.Prelude
-open SqlStreamStore.FSharp
 open SqlStreamStore.Streams
 
 [<AbstractClass>]
