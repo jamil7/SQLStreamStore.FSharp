@@ -16,33 +16,54 @@ module AllStreamController =
         | _ -> Async.singleton (Error IllegalArgumentException)
 
     type StreamController(store: SqlStreamStore.IStreamStore, readDirection: ReadDirection, ?prefetch: bool) =
+        inherit AbstractAllStreamController<StartPosition>()
+
         let prefetch' = defaultArg prefetch false
 
-        interface IAllStreamController<StartPosition> with
-            member this.length(?messageCount: int, ?startPosition: StartPosition): AsyncResult<int64, exn> =
-                let messageCount' = defaultArg messageCount 100
+        override this.filteredMessagesJsonData(predicate: StreamMessage -> bool,
+                                               ?messageCount: int,
+                                               ?startPosition: StartPosition)
+                                               : AsyncResult<string list, exn> =
+            let messageCount' = defaultArg messageCount 1000
 
-                let startPosition' =
-                    defaultArg startPosition StartPosition.Any
+            let startPosition' =
+                defaultArg startPosition StartPosition.Any
 
-                asyncResult {
-                    let! readPage = allStreamReadMatcher readDirection prefetch' store startPosition' messageCount'
-                    return readPage.Messages.LongLength
-                }
+            asyncResult {
+                let! readPage = allStreamReadMatcher readDirection prefetch' store startPosition' messageCount'
 
-            member this.messagesJsonData(?messageCount: int, ?startPosition: StartPosition)
-                                         : AsyncResult<string list, exn> =
-                let messageCount' = defaultArg messageCount 1000
+                return! readPage.Messages
+                        |> List.ofArray
+                        |> List.filter predicate
+                        |> List.map (fun msg -> msg.GetJsonData)
+                        |> List.map AsyncResult.ofTask
+                        |> AsyncResult.sequence
+            }
 
-                let startPosition' =
-                    defaultArg startPosition StartPosition.Any
+        override this.length(?messageCount: int, ?startPosition: StartPosition): AsyncResult<int64, exn> =
+            let messageCount' = defaultArg messageCount 100
 
-                asyncResult {
-                    let! readPage = allStreamReadMatcher readDirection prefetch' store startPosition' messageCount'
+            let startPosition' =
+                defaultArg startPosition StartPosition.Any
 
-                    return! readPage.Messages
-                            |> Array.toList
-                            |> List.map (fun msg -> msg.GetJsonData)
-                            |> List.map AsyncResult.ofTask
-                            |> AsyncResult.sequence
-                }
+            asyncResult {
+                let! readPage = allStreamReadMatcher readDirection prefetch' store startPosition' messageCount'
+                return readPage.Messages.LongLength
+            }
+
+        override this.messagesJsonData(?messageCount: int, ?startPosition: StartPosition)
+                                       : AsyncResult<string list, exn> =
+            let messageCount' = defaultArg messageCount 1000
+
+            let startPosition' =
+                defaultArg startPosition StartPosition.Any
+
+            asyncResult {
+                let! readPage = allStreamReadMatcher readDirection prefetch' store startPosition' messageCount'
+
+                return! readPage.Messages
+                        |> Array.toList
+                        |> List.map (fun msg -> msg.GetJsonData)
+                        |> List.map AsyncResult.ofTask
+                        |> AsyncResult.sequence
+            }

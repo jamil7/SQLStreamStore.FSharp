@@ -16,7 +16,7 @@
         <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
-        <Compile Include="IStreamContollers.fs" />
+        <Compile Include="AbstractStreamContollers.fs" />
         <Compile Include="StreamController.fs" />
         <Compile Include="AllStreamConroller.fs" />
     </ItemGroup>
