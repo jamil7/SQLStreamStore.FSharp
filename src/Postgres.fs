@@ -11,7 +11,7 @@ type PostgresConfig =
       schema: string option }
 
 module Postgres =
-    let private settingsStringFromConfig (config: PostgresConfig): string =
+    let private storeSettings (config: PostgresConfig): string =
         sprintf
             "Host=%s;Port=%s;User Id=%s;Password=%s;Database=%s"
             config.host
@@ -20,35 +20,24 @@ module Postgres =
             config.password
             config.database
 
-    let private setSchema (schema: string option)
-                          (settings: SqlStreamStore.PostgresStreamStoreSettings)
-                          : SqlStreamStore.PostgresStreamStoreSettings =
-        match schema with
+    let private setSettingsSchema (config: PostgresConfig)
+                                  (settings: SqlStreamStore.PostgresStreamStoreSettings)
+                                  : SqlStreamStore.PostgresStreamStoreSettings =
+        match config.schema with
         | None -> ()
-        | Some schema -> settings.Schema <- schema
+        | Some (schema) -> settings.Schema <- schema
 
         settings
 
-    /// Connects to a postgres database given a configuration record and an optional schema.
-    /// If no schema is provided the tables will be created directly in the public one.
-    let connect (config: PostgresConfig) (schema: string option): SqlStreamStore.PostgresStreamStore =
-        let storeSettings =
-            SqlStreamStore.PostgresStreamStoreSettings(settingsStringFromConfig config)
-            |> setSchema schema
+    let createStore (config: PostgresConfig): AsyncResult<SqlStreamStore.IStreamStore, exn> =
+        let settings =
+            SqlStreamStore.PostgresStreamStoreSettings(storeSettings config)
+            |> setSettingsSchema config
 
-        new SqlStreamStore.PostgresStreamStore(storeSettings)
+        let store =
+            new SqlStreamStore.PostgresStreamStore(settings)
 
-    /// Connects to a postgres database given a Npgsql configuration string and an optional schema.
-    /// If no schema is provided the tables will be created directly in the public one.
-    let connectWithConfigString (config: string) (schema: string option): SqlStreamStore.PostgresStreamStore =
-        let storeSettings =
-            SqlStreamStore.PostgresStreamStoreSettings(config)
-            |> setSchema schema
-
-        new SqlStreamStore.PostgresStreamStore(storeSettings)
-
-    /// Creates messages, and streams tables that house the data.
-    let createSchema (store: SqlStreamStore.PostgresStreamStore): AsyncResult<unit, exn> =
         asyncResult {
-            return! store.CreateSchemaIfNotExists()
+            do! store.CreateSchemaIfNotExists()
+            return store :> SqlStreamStore.IStreamStore
         }
