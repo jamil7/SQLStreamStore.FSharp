@@ -54,24 +54,24 @@ type ARMessage(message: AsyncResult<StreamMessage, exn>) =
         }
 
 [<AbstractClass>]
-type AbstractAOMessageMethods() =
-    abstract position: unit -> AsyncOption<int64>
-    abstract type': unit -> AsyncOption<string>
-    abstract createdUtc: unit -> AsyncOption<System.DateTime>
-    abstract jsonMetadata: unit -> AsyncOption<string>
-    abstract messageId: unit -> AsyncOption<System.Guid>
-    abstract streamId: unit -> AsyncOption<string>
-    abstract streamVersion: unit -> AsyncOption<int>
-    abstract toString: unit -> AsyncOption<string>
-    abstract jsonData: unit -> AsyncOption<string>
+type AbstractAROMessageMethods() =
+    abstract position: unit -> AsyncResultOption<int64, exn>
+    abstract type': unit -> AsyncResultOption<string, exn>
+    abstract createdUtc: unit -> AsyncResultOption<System.DateTime, exn>
+    abstract jsonMetadata: unit -> AsyncResultOption<string, exn>
+    abstract messageId: unit -> AsyncResultOption<System.Guid, exn>
+    abstract streamId: unit -> AsyncResultOption<string, exn>
+    abstract streamVersion: unit -> AsyncResultOption<int, exn>
+    abstract toString: unit -> AsyncResultOption<string, exn>
+    abstract jsonData: unit -> AsyncResultOption<string, exn>
 
-type AOMessage(message: AsyncOption<StreamMessage>) =
-    inherit AbstractAOMessageMethods()
+type AROMessage(message: AsyncResultOption<StreamMessage, exn>) =
+    inherit AbstractAROMessageMethods()
 
     let mapLiftSequence f =
-        asyncOption {
+        asyncResultOption {
             let! message' = message
-            return! AsyncOption.singleton (f message')
+            return! AsyncResultOption.singleton (f message')
         }
 
     override this.position() =
@@ -99,8 +99,7 @@ type AOMessage(message: AsyncOption<StreamMessage>) =
 
 
     override this.jsonData() =
-        asyncOption {
+        asyncResultOption {
             let! message' = message
-
-            return! AsyncOption.ofTask message'.GetJsonData
+            return! AsyncResultOption.ofTask message'.GetJsonData
         }

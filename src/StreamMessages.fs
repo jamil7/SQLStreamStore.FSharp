@@ -35,14 +35,6 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
             return f messages'
         }
 
-    let tryApply f =
-        asyncResult {
-            let! messages' = messages
-            return f messages' |> AsyncOption.ofOption
-        }
-        |> AsyncOption.ofAsyncResult
-        |> AsyncOption.bind id
-
     override this.position() =
         mapLiftSequence (fun msg -> msg.Position)
 
@@ -97,8 +89,8 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
     member this.length() = apply List.length
 
     member this.tryFind(predicate: StreamMessage -> bool) =
-        AOMessage(tryApply (List.tryFind predicate))
+        AROMessage(apply (List.tryFind predicate))
 
-    member this.tryHead() = AOMessage(tryApply List.tryHead)
+    member this.tryHead() = AROMessage(apply List.tryHead)
 
-    member this.tryLast() = AOMessage(tryApply List.tryLast)
+    member this.tryLast() = AROMessage(apply List.tryLast)
