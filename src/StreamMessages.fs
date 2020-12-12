@@ -76,16 +76,29 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
                     |> AsyncResult.sequence
         }
 
-    /// Returns the length of StreamMessages list.
-    member this.length() = apply List.length
+    member this.choose(chooser: StreamMessage -> StreamMessage option) =
+        StreamMessages(apply (List.choose chooser))
 
+    member this.exists(predicate: StreamMessage -> bool) = apply (List.exists predicate)
+    member this.find(predicate: StreamMessage -> bool) = ARMessage(apply (List.find predicate))
+
+    /// Returns the length of StreamMessages list.
     member this.filter(predicate: StreamMessage -> bool) =
         StreamMessages(apply (List.filter predicate))
 
+    member this.fold(folder: StreamMessage list -> StreamMessage -> StreamMessage list, ?state: StreamMessage list) =
+        let state' = defaultArg state List.empty
+        StreamMessages(apply (List.fold folder state'))
+
     member this.head() = ARMessage(apply List.head)
+
+    member this.last() = ARMessage(apply List.last)
+
+    member this.length() = apply List.length
+
+    member this.tryFind(predicate: StreamMessage -> bool) =
+        AOMessage(tryApply (List.tryFind predicate))
 
     member this.tryHead() = AOMessage(tryApply List.tryHead)
 
-    member this.last() = ARMessage(apply List.last)
-    
     member this.tryLast() = AOMessage(tryApply List.tryLast)
