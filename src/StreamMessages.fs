@@ -80,9 +80,9 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
         StreamMessages(apply (List.choose chooser))
 
     member this.exists(predicate: StreamMessage -> bool) = apply (List.exists predicate)
+
     member this.find(predicate: StreamMessage -> bool) = ARMessage(apply (List.find predicate))
 
-    /// Returns the length of StreamMessages list.
     member this.filter(predicate: StreamMessage -> bool) =
         StreamMessages(apply (List.filter predicate))
 
