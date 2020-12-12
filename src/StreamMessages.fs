@@ -4,7 +4,7 @@ open FSharp.Prelude
 open SqlStreamStore.Streams
 
 [<AbstractClass>]
-type AbstractARMessageMethods() =
+type AbstractStandardStreamMethods() =
     abstract position: unit -> AsyncResult<int64 list, exn>
     abstract type': unit -> AsyncResult<string list, exn>
     abstract createdUtc: unit -> AsyncResult<System.DateTime list, exn>
@@ -17,7 +17,7 @@ type AbstractARMessageMethods() =
 
 
 type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
-    inherit AbstractARMessageMethods()
+    inherit AbstractStandardStreamMethods()
 
     let mapLiftSequence f =
         asyncResult {
@@ -28,6 +28,20 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
                     |> List.map AsyncResult.singleton
                     |> AsyncResult.sequence
         }
+
+    let apply f =
+        asyncResult {
+            let! messages' = messages
+            return f messages'
+        }
+
+    let tryApply f =
+        asyncResult {
+            let! messages' = messages
+            return f messages' |> AsyncOption.ofOption
+        }
+        |> AsyncOption.ofAsyncResult
+        |> AsyncOption.bind id
 
     override this.position() =
         mapLiftSequence (fun msg -> msg.Position)
@@ -62,25 +76,16 @@ type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
                     |> AsyncResult.sequence
         }
 
-    member this.length() =
-        asyncResult {
-            let! messages' = messages
-            return messages'.Length
-        }
+    /// Returns the length of StreamMessages list.
+    member this.length() = apply List.length
 
     member this.filter(predicate: StreamMessage -> bool) =
-        let messages' =
-            asyncResult {
-                let! messages' = messages
-                return List.filter predicate messages'
-            }
+        StreamMessages(apply (List.filter predicate))
 
-        StreamMessages(messages')
+    member this.head() = ARMessage(apply List.head)
 
-    member this.tryHead() =
-        asyncResult {
-            let! messages' = messages
-            return List.tryHead messages' |> AsyncOption.ofOption
-        }
-        |> AsyncOption.ofAsyncResult
-        |> AsyncOption.bind id
+    member this.tryHead() = AOMessage(tryApply List.tryHead)
+
+    member this.last() = ARMessage(apply List.last)
+    
+    member this.tryLast() = AOMessage(tryApply List.tryLast)
