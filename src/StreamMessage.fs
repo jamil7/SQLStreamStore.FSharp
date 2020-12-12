@@ -4,7 +4,7 @@ open FSharp.Prelude
 open SqlStreamStore.Streams
 
 [<AbstractClass>]
-type AbstractARMessageMethods() =
+type AbstractARMessage() =
     abstract position: unit -> AsyncResult<int64, exn>
     abstract type': unit -> AsyncResult<string, exn>
     abstract createdUtc: unit -> AsyncResult<System.DateTime, exn>
@@ -16,7 +16,7 @@ type AbstractARMessageMethods() =
     abstract jsonData: unit -> AsyncResult<string, exn>
 
 type ARMessage(message: AsyncResult<StreamMessage, exn>) =
-    inherit AbstractARMessageMethods()
+    inherit AbstractARMessage()
 
     let mapLiftSequence f =
         asyncResult {
@@ -54,7 +54,7 @@ type ARMessage(message: AsyncResult<StreamMessage, exn>) =
         }
 
 [<AbstractClass>]
-type AbstractAROMessageMethods() =
+type AbstractAROMessage() =
     abstract position: unit -> AsyncResultOption<int64, exn>
     abstract type': unit -> AsyncResultOption<string, exn>
     abstract createdUtc: unit -> AsyncResultOption<System.DateTime, exn>
@@ -66,7 +66,7 @@ type AbstractAROMessageMethods() =
     abstract jsonData: unit -> AsyncResultOption<string, exn>
 
 type AROMessage(message: AsyncResultOption<StreamMessage, exn>) =
-    inherit AbstractAROMessageMethods()
+    inherit AbstractAROMessage()
 
     let mapLiftSequence f =
         asyncResultOption {
