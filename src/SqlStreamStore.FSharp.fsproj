@@ -16,6 +16,7 @@
         <Compile Include="Postgres.fs" />
         <Compile Include="Append.fs" />
         <Compile Include="Read.fs" />
+        <Compile Include="SMessage.fs" />
         <Compile Include="StreamMessages.fs" />
         <Compile Include="AbstractContollers.fs" />
         <Compile Include="StreamController.fs" />

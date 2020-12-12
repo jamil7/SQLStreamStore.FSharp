@@ -4,7 +4,7 @@ open FSharp.Prelude
 open SqlStreamStore.Streams
 
 [<AbstractClass>]
-type AbstractStandardFunctionality() =
+type AbstractStandardStreamMessageMethods() =
     abstract position: unit -> AsyncResult<int64 list, exn>
     abstract type': unit -> AsyncResult<string list, exn>
     abstract createdUtc: unit -> AsyncResult<System.DateTime list, exn>
@@ -17,7 +17,7 @@ type AbstractStandardFunctionality() =
 
 
 type StreamMessages(messages: AsyncResult<StreamMessage list, exn>) =
-    inherit AbstractStandardFunctionality()
+    inherit AbstractStandardStreamMessageMethods()
 
     let mapLiftSequence f =
         asyncResult {
