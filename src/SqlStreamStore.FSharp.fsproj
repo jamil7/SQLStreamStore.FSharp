@@ -21,6 +21,7 @@
         <Compile Include="AbstractContoller.fs" />
         <Compile Include="StreamController.fs" />
         <Compile Include="AllStreamConroller.fs" />
+        <Compile Include="SController.fs" />
     </ItemGroup>
 
     <ItemGroup>
