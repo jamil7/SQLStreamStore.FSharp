@@ -12,40 +12,83 @@ type private Metadata =
       correlationId: Guid
       meta: string option }
 
-type NewStreamEvent<'a>(author: string,
-                        data: 'a,
-                        ?id: Guid,
-                        ?metadata: string,
-                        ?timestamp: DateTimeOffset,
-                        ?causationId: Guid,
-                        ?correlationId: Guid,
-                        ?encoder: 'a -> string) =
+type private NewStreamEventInternal<'a> =
+    { data: 'a
+      author: string
+      id: Guid
+      timestamp: DateTimeOffset
+      correlationId: Guid
+      causationId: Guid option
+      metadata: string option }
 
-    let id' = defaultArg id (Guid.NewGuid())
+type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
-    let timestamp' = defaultArg timestamp DateTimeOffset.Now
-
-    let correlationId' =
-        defaultArg correlationId (Guid.NewGuid())
-
-    member this.toStreamMessage(): NewStreamMessage =
-        let metadata': Metadata =
-            { timestamp = timestamp'
+module NewStreamEvent =
+    let create<'a> author (data: 'a): NewStreamEvent<'a> =
+        NewStreamEvent
+            { data = data
               author = author
-              causationId = causationId
-              correlationId = correlationId'
-              meta = metadata }
+              id = Guid.NewGuid()
+              timestamp = DateTimeOffset.Now
+              correlationId = Guid.NewGuid()
+              causationId = None
+              metadata = None }
 
-        let encode =
-            match encoder with
-            | None -> JayJson.encode
-            | Some enc -> enc
+    let withId (id: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+        fun (NewStreamEvent eventData) -> NewStreamEvent { eventData with id = id }
 
-        let unionToString: 'a -> string =
-            fun a ->
-                let (case, _) =
-                    FSharp.Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
+    let withTimestamp (timestamp: DateTimeOffset): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+        fun (NewStreamEvent eventData) -> NewStreamEvent { eventData with timestamp = timestamp }
 
-                case.Name
+    let withCorrelationId (correlationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+        fun (NewStreamEvent eventData) ->
+            NewStreamEvent
+                { eventData with
+                      correlationId = correlationId }
 
-        NewStreamMessage(id', "Event::" + unionToString data, encode data, JayJson.encode metadata')
+    let withCausationId (causationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+        fun (NewStreamEvent eventData) ->
+            NewStreamEvent
+                { eventData with
+                      causationId = Some causationId }
+
+    let withMetadata (metadata: string): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+        fun (NewStreamEvent eventData) ->
+            NewStreamEvent
+                { eventData with
+                      metadata = Some metadata }
+
+[<Struct>]
+type StreamEvent<'a> =
+    { getData: unit -> AsyncResult<'a, exn>
+      author: string
+      id: Guid
+      timestamp: DateTimeOffset
+      correlationId: Guid
+      causationId: Guid option
+      metadata: string option
+      position: int64
+      streamVersion: int
+      streamId: string }
+
+module StreamEvent =
+    let ofStreamMessage (msg: StreamMessage): StreamEvent<'a> =
+        let meta =
+            JayJson.decode<Metadata> msg.JsonMetadata
+
+        let getData () =
+            asyncResult {
+                let! json = msg.GetJsonData()
+                return JayJson.decode<'a> json
+            }
+
+        { author = meta.author
+          getData = getData
+          id = msg.MessageId
+          timestamp = meta.timestamp
+          correlationId = meta.correlationId
+          causationId = meta.causationId
+          metadata = meta.meta
+          position = msg.Position
+          streamVersion = msg.StreamVersion
+          streamId = msg.StreamId }
