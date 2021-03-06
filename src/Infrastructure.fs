@@ -6,8 +6,8 @@ module SerializationConfig =
     open System.Text.Json.Serialization
 
     type SerializerConfig<'a> =
-        { encode: 'a -> string
-          decode: string -> 'a }
+        { serialize: 'a -> string
+          deserialize: string -> 'a }
 
     let private opt =
         JsonSerializerOptions(IgnoreNullValues = true)
@@ -19,13 +19,13 @@ module SerializationConfig =
     opt.Converters.Add converterOpt
 
     let DefaultSerializationConfig: SerializerConfig<'a> =
-        { encode = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
-          decode = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt) }
+        { serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
+          deserialize = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt) }
 
 module internal Serdes =
 
     open SerializationConfig
 
-    let encode<'a> : 'a -> string = DefaultSerializationConfig.encode
+    let serialize<'a> : 'a -> string = DefaultSerializationConfig.serialize
 
-    let decode<'a> : string -> 'a = DefaultSerializationConfig.decode
+    let deserialize<'a> : string -> 'a = DefaultSerializationConfig.deserialize

@@ -74,12 +74,12 @@ type StreamEvent<'a> =
 module StreamEvent =
     let ofStreamMessage (msg: StreamMessage): StreamEvent<'a> =
         let meta =
-            Serdes.decode<Metadata> msg.JsonMetadata
+            Serdes.deserialize<Metadata> msg.JsonMetadata
 
         let getData () =
             asyncResult {
                 let! json = msg.GetJsonData()
-                return Serdes.decode<'a> json
+                return Serdes.deserialize<'a> json
             }
 
         { author = meta.author
