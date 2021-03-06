@@ -24,7 +24,7 @@ type private NewStreamEventInternal<'a> =
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
 module NewStreamEvent =
-    let create<'a> author (data: 'a): NewStreamEvent<'a> =
+    let create<'a> (author: string) (data: 'a): NewStreamEvent<'a> =
         NewStreamEvent
             { data = data
               author = author
