@@ -22,8 +22,8 @@
     
     <ItemGroup>
       <Compile Include="Infrastructure.fs" />
-      <Compile Include="SqlStreamStoreExtensions.fs" />
       <Compile Include="StreamEvent.fs" />
+      <Compile Include="SqlStreamStoreExtensions.fs" />
     </ItemGroup>
     
 </Project>

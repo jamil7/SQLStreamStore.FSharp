@@ -24,6 +24,12 @@ type private NewStreamEventInternal<'a> =
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
 module NewStreamEvent =
+    /// Creates a NewStreamEvent with the following defaults:
+    /// id = Guid.NewGuid()
+    /// timestamp = DateTimeOffset.Now
+    /// correlationId = Guid.NewGuid()
+    /// causationId = None
+    /// metadata = None
     let create<'a> (author: string) (data: 'a): NewStreamEvent<'a> =
         NewStreamEvent
             { data = data
@@ -35,28 +41,46 @@ module NewStreamEvent =
               metadata = None }
 
     let withId (id: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
-        fun (NewStreamEvent eventData) -> NewStreamEvent { eventData with id = id }
+        fun (NewStreamEvent event) -> NewStreamEvent { event with id = id }
 
     let withTimestamp (timestamp: DateTimeOffset): NewStreamEvent<'a> -> NewStreamEvent<'a> =
-        fun (NewStreamEvent eventData) -> NewStreamEvent { eventData with timestamp = timestamp }
+        fun (NewStreamEvent event) -> NewStreamEvent { event with timestamp = timestamp }
 
     let withCorrelationId (correlationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
-        fun (NewStreamEvent eventData) ->
+        fun (NewStreamEvent event) ->
             NewStreamEvent
-                { eventData with
+                { event with
                       correlationId = correlationId }
 
     let withCausationId (causationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
-        fun (NewStreamEvent eventData) ->
+        fun (NewStreamEvent event) ->
             NewStreamEvent
-                { eventData with
+                { event with
                       causationId = Some causationId }
 
     let withMetadata (metadata: string): NewStreamEvent<'a> -> NewStreamEvent<'a> =
-        fun (NewStreamEvent eventData) ->
-            NewStreamEvent
-                { eventData with
-                      metadata = Some metadata }
+        fun (NewStreamEvent event) -> NewStreamEvent { event with metadata = Some metadata }
+
+    let internal toNewStreamMessage: NewStreamEvent<'a> -> NewStreamMessage =
+        fun (NewStreamEvent event) ->
+            let metadata: Metadata =
+                { timestamp = event.timestamp
+                  author = event.author
+                  causationId = event.causationId
+                  correlationId = event.correlationId
+                  meta = event.metadata }
+
+            let unionToString: 'a -> string =
+                fun a ->
+                    Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
+                    |> fst
+                    |> fun case -> case.Name
+
+            NewStreamMessage
+                (event.id,
+                 "Event::" + unionToString event.data,
+                 Serializer.serialize event.data,
+                 Serializer.serialize metadata)
 
 [<Struct>]
 type StreamEvent<'a> =
