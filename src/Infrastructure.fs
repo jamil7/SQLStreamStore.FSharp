@@ -22,7 +22,7 @@ module SerializationConfig =
         { serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
           deserialize = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt) }
 
-module internal Serdes =
+module internal Serializer =
 
     open SerializationConfig
 
