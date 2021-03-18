@@ -21,29 +21,78 @@ type PostgresConfig =
             this.database
             maxPoolSize'
 
-type NewStreamStore =
+//type NewStreamStore =
+//    /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
+//    static member inMemoryStore() = new InMemoryStreamStore()
+//
+//    /// Connect to a Postgres Database.
+//    /// Defaults: schema = public, createSchemaIfNotExists = true
+//    static member postgresStore(config: PostgresConfig, ?schema: string, ?createSchemaIfNotExists: bool) =
+//        let createSchemaIfNotExists' = defaultArg createSchemaIfNotExists true
+//
+//        let storeSettings =
+//            let settings =
+//                PostgresStreamStoreSettings(config.toConnectionString ())
+//
+//            match schema with
+//            | None -> settings
+//            | Some schema' ->
+//                settings.Schema <- schema'
+//                settings
+//
+//        let store = new PostgresStreamStore(storeSettings)
+//
+//        asyncResult {
+//            if createSchemaIfNotExists' then do! store.CreateSchemaIfNotExists() else ()
+//
+//            return store :> IStreamStore
+//        }
+
+type private NewStreamStoreInternal =
+    { config: PostgresConfig
+      schema: string option
+      createSchemaIfNotExists: bool }
+
+type NewStreamStore = private NewStreamStore of NewStreamStoreInternal
+
+module NewStreamStore =
+
     /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
-    static member inMemoryStore() = new InMemoryStreamStore()
+    let inMemoryStore () = new InMemoryStreamStore()
 
     /// Connect to a Postgres Database.
-    /// Defaults: schema = public, createSchemaIfNotExists = true
-    static member postgresStore(config: PostgresConfig, ?schema: string, ?createSchemaIfNotExists: bool) =
-        let createSchemaIfNotExists' = defaultArg createSchemaIfNotExists true
+    let postgresStore (config: PostgresConfig): NewStreamStore -> NewStreamStore =
+        fun (NewStreamStore store) ->
+            NewStreamStore
+                { store with
+                      config = config
+                      createSchemaIfNotExists = false }
 
-        let storeSettings =
-            let settings =
-                PostgresStreamStoreSettings(config.toConnectionString ())
+    let withSchema (schema: string): NewStreamStore -> NewStreamStore =
+        fun (NewStreamStore store) -> NewStreamStore { store with schema = Some schema }
 
-            match schema with
-            | None -> settings
-            | Some schema' ->
-                settings.Schema <- schema'
-                settings
+    let withCreateSchemaIfNotExists: NewStreamStore -> NewStreamStore =
+        fun (NewStreamStore store) ->
+            NewStreamStore
+                { store with
+                      createSchemaIfNotExists = true }
 
-        let store = new PostgresStreamStore(storeSettings)
+    let connect: NewStreamStore -> AsyncResult<IStreamStore, exn> =
+        fun (NewStreamStore store) ->
+            let storeSettings =
+                let settings =
+                    PostgresStreamStoreSettings(store.config.toConnectionString ())
 
-        asyncResult {
-            if createSchemaIfNotExists' then do! store.CreateSchemaIfNotExists() else ()
+                match store.schema with
+                | None -> settings
+                | Some schema' ->
+                    settings.Schema <- schema'
+                    settings
 
-            return store :> IStreamStore
-        }
+            let store' = new PostgresStreamStore(storeSettings)
+
+            asyncResult {
+                if store.createSchemaIfNotExists then do! store'.CreateSchemaIfNotExists() else ()
+
+                return store' :> IStreamStore
+            }
