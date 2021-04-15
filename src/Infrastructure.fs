@@ -6,8 +6,10 @@ module SerializationConfig =
     open System.Text.Json.Serialization
 
     type SerializerConfig<'a> =
-        { serialize: 'a -> string
-          deserialize: string -> 'a }
+        {
+            serialize: 'a -> string
+            deserialize: string -> 'a
+        }
 
     let private opt =
         JsonSerializerOptions(IgnoreNullValues = true)
@@ -22,8 +24,10 @@ module SerializationConfig =
     do opt.Converters.Add converterOpt
 
     let DefaultSerializationConfig : SerializerConfig<'a> =
-        { serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
-          deserialize = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt) }
+        {
+            serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
+            deserialize = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt)
+        }
 
 module internal Serializer =
 
@@ -38,7 +42,7 @@ module Helpers =
 
     open System.Threading
 
-    let internal memoize : ('a -> 'b) -> 'a -> 'b =
+    let private memoize : ('a -> 'b) -> 'a -> 'b =
         fun f a ->
             let cache =
                 System.Collections.Concurrent.ConcurrentDictionary<'a, Lazy<'b>>()
@@ -54,3 +58,11 @@ module Helpers =
                 lazyRes.Value
 
             getOrAdd a f
+
+    let private unionToString' : 'a -> string =
+        fun a ->
+            Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
+            |> fst
+            |> fun case -> case.Name
+
+    let internal unionToString : 'a -> string = fun a -> memoize unionToString' a

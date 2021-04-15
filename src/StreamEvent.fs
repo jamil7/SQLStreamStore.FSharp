@@ -6,20 +6,24 @@ open SqlStreamStore.Streams
 open System
 
 type private Metadata =
-    { timestamp: DateTimeOffset
-      author: string
-      causationId: Guid option
-      correlationId: Guid
-      meta: string option }
+    {
+        timestamp: DateTimeOffset
+        author: string
+        causationId: Guid option
+        correlationId: Guid
+        meta: string option
+    }
 
 type private NewStreamEventInternal<'a> =
-    { data: 'a
-      author: string
-      id: Guid
-      timestamp: DateTimeOffset
-      correlationId: Guid
-      causationId: Guid option
-      metadata: string option }
+    {
+        data: 'a
+        author: string
+        id: Guid
+        timestamp: DateTimeOffset
+        correlationId: Guid
+        causationId: Guid option
+        metadata: string option
+    }
 
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
@@ -30,89 +34,95 @@ module NewStreamEvent =
     /// correlationId = Guid.NewGuid()
     /// causationId = None
     /// metadata = None
-    let create<'a> (author: string) (data: 'a): NewStreamEvent<'a> =
+    let create<'a> (author: string) (data: 'a) : NewStreamEvent<'a> =
         NewStreamEvent
-            { data = data
-              author = author
-              id = Guid.NewGuid()
-              timestamp = DateTimeOffset.Now
-              correlationId = Guid.NewGuid()
-              causationId = None
-              metadata = None }
+            {
+                author = author
+                causationId = None
+                correlationId = Guid.NewGuid()
+                data = data
+                id = Guid.NewGuid()
+                metadata = None
+                timestamp = DateTimeOffset.Now
+            }
 
-    let withId (id: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withId (id: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with id = id }
 
-    let withTimestamp (timestamp: DateTimeOffset): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withTimestamp (timestamp: DateTimeOffset) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with timestamp = timestamp }
 
-    let withCorrelationId (correlationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withCorrelationId (correlationId: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
         fun (NewStreamEvent event) ->
             NewStreamEvent
                 { event with
-                      correlationId = correlationId }
+                    correlationId = correlationId
+                }
 
-    let withCausationId (causationId: Guid): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withCausationId (causationId: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
         fun (NewStreamEvent event) ->
             NewStreamEvent
                 { event with
-                      causationId = Some causationId }
+                    causationId = Some causationId
+                }
 
-    let withMetadata (metadata: string): NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withMetadata (metadata: string) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with metadata = Some metadata }
 
-    let internal toNewStreamMessage: NewStreamEvent<'a> -> NewStreamMessage =
+    let internal toNewStreamMessage : NewStreamEvent<'a> -> NewStreamMessage =
         fun (NewStreamEvent event) ->
-            let metadata: Metadata =
-                { timestamp = event.timestamp
-                  author = event.author
-                  causationId = event.causationId
-                  correlationId = event.correlationId
-                  meta = event.metadata }
+            let metadata : Metadata =
+                {
+                    author = event.author
+                    causationId = event.causationId
+                    correlationId = event.correlationId
+                    meta = event.metadata
+                    timestamp = event.timestamp
+                }
 
-            let unionToString: 'a -> string =
-                fun a ->
-                    Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
-                    |> fst
-                    |> fun case -> case.Name
-
-            NewStreamMessage
-                (event.id,
-                 "Event::" + unionToString event.data,
-                 Serializer.serialize event.data,
-                 Serializer.serialize metadata)
+            NewStreamMessage(
+                event.id,
+                "Event::" + unionToString event.data,
+                Serializer.serialize event.data,
+                Serializer.serialize metadata
+            )
 
 [<Struct>]
-type StreamEvent<'a> =
-    { getData: unit -> AsyncResult<'a, exn>
-      author: string
-      id: Guid
-      timestamp: DateTimeOffset
-      correlationId: Guid
-      causationId: Guid option
-      metadata: string option
-      position: int64
-      streamVersion: int
-      streamId: string }
+type StreamEvent<'event> =
+    {
+        author: string
+        causationId: Guid option
+        correlationId: Guid
+        data: AsyncResult<'event, exn>
+        id: Guid
+        metadata: string option
+        position: int64
+        streamId: string
+        streamVersion: int
+        timestamp: DateTimeOffset
+        typeAsString: string
+    }
 
 module StreamEvent =
-    let ofStreamMessage (msg: StreamMessage): StreamEvent<'a> =
+
+    let ofStreamMessage<'event> (msg: StreamMessage) : StreamEvent<'event> =
         let meta =
             Serializer.deserialize<Metadata> msg.JsonMetadata
 
-        let getData () =
-            asyncResult {
-                let! json = msg.GetJsonData()
-                return Serializer.deserialize<'a> json
-            }
-
-        { author = meta.author
-          getData = getData
-          id = msg.MessageId
-          timestamp = meta.timestamp
-          correlationId = meta.correlationId
-          causationId = meta.causationId
-          metadata = meta.meta
-          position = msg.Position
-          streamVersion = msg.StreamVersion
-          streamId = msg.StreamId }
+        {
+            author = meta.author
+            causationId = meta.causationId
+            correlationId = meta.correlationId
+            data =
+                asyncResult {
+                    let! json = msg.GetJsonData()
+                    return Serializer.deserialize<'event> json
+                }
+            id = msg.MessageId
+            metadata = meta.meta
+            position = msg.Position
+            streamId = msg.StreamId
+            streamVersion = msg.StreamVersion
+            timestamp = meta.timestamp
+            typeAsString = msg.Type
+        }
