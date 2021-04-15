@@ -1,6 +1,5 @@
 namespace SqlStreamStore.FSharp
 
-open FSharp.Prelude
 open SqlStreamStore
 
 type PostgresConfig =
@@ -9,7 +8,7 @@ type PostgresConfig =
       username: string
       password: string
       database: string }
-    member this.toConnectionString(?maxPoolSize): string =
+    member this.ToConnectionString(?maxPoolSize) : string =
         let maxPoolSize' = defaultArg maxPoolSize "10"
 
         sprintf
@@ -21,78 +20,36 @@ type PostgresConfig =
             this.database
             maxPoolSize'
 
-//type NewStreamStore =
-//    /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
-//    static member inMemoryStore() = new InMemoryStreamStore()
-//
-//    /// Connect to a Postgres Database.
-//    /// Defaults: schema = public, createSchemaIfNotExists = true
-//    static member postgresStore(config: PostgresConfig, ?schema: string, ?createSchemaIfNotExists: bool) =
-//        let createSchemaIfNotExists' = defaultArg createSchemaIfNotExists true
-//
-//        let storeSettings =
-//            let settings =
-//                PostgresStreamStoreSettings(config.toConnectionString ())
-//
-//            match schema with
-//            | None -> settings
-//            | Some schema' ->
-//                settings.Schema <- schema'
-//                settings
-//
-//        let store = new PostgresStreamStore(storeSettings)
-//
-//        asyncResult {
-//            if createSchemaIfNotExists' then do! store.CreateSchemaIfNotExists() else ()
-//
-//            return store :> IStreamStore
-//        }
-
-type private NewStreamStoreInternal =
-    { config: PostgresConfig
-      schema: string option
-      createSchemaIfNotExists: bool }
-
-type NewStreamStore = private NewStreamStore of NewStreamStoreInternal
+type PostgresStoreOptions =
+    | Schema of string
+    | CreateSchemaIfNotExists
 
 module NewStreamStore =
 
     /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
-    let inMemoryStore () = new InMemoryStreamStore()
+    let inMemoryStore : unit -> InMemoryStreamStore = fun _ -> new InMemoryStreamStore()
 
-    /// Connect to a Postgres Database.
-    let postgresStore (config: PostgresConfig): NewStreamStore -> NewStreamStore =
-        fun (NewStreamStore store) ->
-            NewStreamStore
-                { store with
-                      config = config
-                      createSchemaIfNotExists = false }
+    let postgresStore' (config: PostgresConfig) (postgresStoreOptions: PostgresStoreOptions list) =
 
-    let withSchema (schema: string): NewStreamStore -> NewStreamStore =
-        fun (NewStreamStore store) -> NewStreamStore { store with schema = Some schema }
+        let mutable schema = None
+        let mutable createSchemaIfNotExists = false
 
-    let withCreateSchemaIfNotExists: NewStreamStore -> NewStreamStore =
-        fun (NewStreamStore store) ->
-            NewStreamStore
-                { store with
-                      createSchemaIfNotExists = true }
+        postgresStoreOptions
+        |> List.iter
+            (function
+            | Schema s -> schema <- Some s
+            | CreateSchemaIfNotExists -> createSchemaIfNotExists <- true)
 
-    let connect: NewStreamStore -> AsyncResult<IStreamStore, exn> =
-        fun (NewStreamStore store) ->
-            let storeSettings =
-                let settings =
-                    PostgresStreamStoreSettings(store.config.toConnectionString ())
+        let storeSettings =
+            let settings =
+                PostgresStreamStoreSettings(config.ToConnectionString())
 
-                match store.schema with
-                | None -> settings
-                | Some schema' ->
-                    settings.Schema <- schema'
-                    settings
+            match schema with
+            | None -> settings
+            | Some schema' ->
+                settings.Schema <- schema'
+                settings
 
-            let store' = new PostgresStreamStore(storeSettings)
+        new PostgresStreamStore(storeSettings) :> IStreamStore
 
-            asyncResult {
-                if store.createSchemaIfNotExists then do! store'.CreateSchemaIfNotExists() else ()
-
-                return store' :> IStreamStore
-            }
+    let postgresStore (config: PostgresConfig) = postgresStore' config []
