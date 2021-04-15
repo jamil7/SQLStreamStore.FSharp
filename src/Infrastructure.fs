@@ -19,7 +19,7 @@ module SerializationConfig =
             unionEncoding = JsonUnionEncoding.AdjacentTag
         )
 
-    opt.Converters.Add converterOpt
+    do opt.Converters.Add converterOpt
 
     let DefaultSerializationConfig : SerializerConfig<'a> =
         { serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
