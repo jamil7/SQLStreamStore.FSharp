@@ -28,7 +28,7 @@ type private NewStreamEventInternal<'a> =
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
 module NewStreamEvent =
-    
+
     /// Creates a NewStreamEvent with the following defaults:
     /// id = Guid.NewGuid()
     /// timestamp = DateTimeOffset.Now
@@ -114,11 +114,7 @@ module StreamEvent =
             author = meta.author
             causationId = meta.causationId
             correlationId = meta.correlationId
-            data =
-                asyncResult {
-                    let! json = msg.GetJsonData()
-                    return Serializer.deserialize<'event> json
-                }
+            data = AsyncResult.map Serializer.deserialize<'event> (msg.GetJsonData())
             id = msg.MessageId
             metadata = meta.meta
             position = msg.Position

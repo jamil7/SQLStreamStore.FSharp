@@ -1,7 +1,6 @@
 namespace SqlStreamStore.FSharp
 
 open FSharp.Prelude
-open SqlStreamStore.FSharp.EventSourcing
 open SqlStreamStore.Streams
 
 [<AutoOpen>]
