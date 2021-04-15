@@ -3,11 +3,13 @@ namespace SqlStreamStore.FSharp
 open SqlStreamStore
 
 type PostgresConfig =
-    { host: string
-      port: string
-      username: string
-      password: string
-      database: string }
+    {
+        host: string
+        port: string
+        username: string
+        password: string
+        database: string
+    }
     member this.ToConnectionString(?maxPoolSize) : string =
         let maxPoolSize' = defaultArg maxPoolSize "10"
 
