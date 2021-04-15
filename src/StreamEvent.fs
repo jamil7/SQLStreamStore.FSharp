@@ -7,22 +7,22 @@ open System
 
 type private Metadata =
     {
-        timestamp: DateTimeOffset
         author: string
         causationId: Guid option
         correlationId: Guid
         meta: string option
+        timestamp: DateTimeOffset
     }
 
 type private NewStreamEventInternal<'a> =
     {
-        data: 'a
         author: string
-        id: Guid
-        timestamp: DateTimeOffset
-        correlationId: Guid
         causationId: Guid option
+        correlationId: Guid
+        data: 'a
+        id: Guid
         metadata: string option
+        timestamp: DateTimeOffset
     }
 
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
