@@ -26,11 +26,41 @@ module SqlStreamExtensions =
     let private listAllStreams (store: IStreamStore) (maxCount: int) (continuationToken: string) =
         asyncResult { return! store.ListStreams(maxCount, continuationToken) }
 
-    let private readHeadPosition (store: IStreamStore) token =
-        asyncResult { return! store.ReadHeadPosition(token) }
+    let private readHeadPosition (store: IStreamStore) cancellationToken =
+        asyncResult { return! store.ReadHeadPosition(cancellationToken) }
 
-    let private appendToStream (store: IStreamStore) streamId expectedVersion messages token =
-        asyncResult { return! store.AppendToStream(StreamId streamId, expectedVersion, messages, token) }
+    let private appendToStream (store: IStreamStore) streamId expectedVersion messages cancellationToken =
+        asyncResult { return! store.AppendToStream(StreamId streamId, expectedVersion, messages, cancellationToken) }
+
+    let private deleteMessage (store: IStreamStore) streamId msgId cancellationToken =
+        asyncResult { return! store.DeleteMessage(StreamId streamId, msgId, cancellationToken) }
+
+    let private deleteStream (store: IStreamStore) streamId version cancellationToken =
+        asyncResult { return! store.DeleteStream(StreamId streamId, version, cancellationToken) }
+
+    let private getStreamMetadata (store: IStreamStore) streamId cancellationToken =
+        asyncResult { return! store.GetStreamMetadata(streamId, cancellationToken) }
+
+    let private setStreamMetadata
+        (store: IStreamStore)
+        streamId
+        expectedStreamMetadataVersion
+        maxAge
+        maxCount
+        metadataJson
+        cancellationToken
+        =
+        asyncResult {
+            return!
+                store.SetStreamMetadata(
+                    StreamId streamId,
+                    expectedStreamMetadataVersion,
+                    maxAge,
+                    maxCount,
+                    metadataJson,
+                    cancellationToken
+                )
+        }
 
     type IStreamStore with
 
@@ -41,6 +71,67 @@ module SqlStreamExtensions =
 
             appendToStream this streamId expectedVersion messages cancellationToken'
 
+        /// Hard deletes a message from the stream.
+        /// Deleting a message will result in a '$message-deleted' message being appended to the '$deleted' stream.
+        /// See SqlStreamStore.Streams.Deleted.MessageDeleted for the message structure.
+        member this.DeleteMessage(streamId, messageId, ?cancellationToken) =
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+            deleteMessage this streamId messageId cancellationToken'
+
+        /// Hard deletes a stream and all of its messages.
+        /// Deleting a stream will result in a '$stream-deleted' message being appended to the '$deleted' stream.
+        /// See SqlStreamStore.Streams.Deleted.StreamDeleted for the message structure.
+        member this.DeleteStream(streamId, expectedVersion, ?cancellationToken) =
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+            deleteStream this streamId expectedVersion cancellationToken'
+
+        /// Gets the stream metadata.
+        member this.GetStreamMetadata(streamId, ?cancellationToken) =
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+            getStreamMetadata this streamId cancellationToken'
+
+        /// Sets the metadata for a stream.
+        member this.SetStreamMetadata
+            (
+                streamId,
+                ?expectedStreamMetadataVersion,
+                ?maxAge: int,
+                ?maxCount: int,
+                ?metadataJson,
+                ?cancellationToken
+            ) =
+            let expectedStreamMetadataVersion' =
+                defaultArg expectedStreamMetadataVersion -2
+
+            let maxAge' =
+                match maxAge with
+                | None -> (Nullable())
+                | Some age -> Nullable age
+
+            let maxCount' =
+                match maxCount with
+                | None -> (Nullable())
+                | Some count -> Nullable count
+
+            let metadataJson' = defaultArg metadataJson null
+
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+            setStreamMetadata
+                this
+                streamId
+                expectedStreamMetadataVersion'
+                maxAge'
+                maxCount'
+                metadataJson'
+                cancellationToken'
 
         /// Reads the head position (the position of the very latest message).
         member this.ReadHeadPosition(?cancellationToken) =
