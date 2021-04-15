@@ -111,12 +111,12 @@ module SqlStreamExtensions =
 
             let maxAge' =
                 match maxAge with
-                | None -> (Nullable())
+                | None -> Nullable()
                 | Some age -> Nullable age
 
             let maxCount' =
                 match maxCount with
-                | None -> (Nullable())
+                | None -> Nullable()
                 | Some count -> Nullable count
 
             let metadataJson' = defaultArg metadataJson null
