@@ -14,12 +14,18 @@ module SqlStreamExtensions =
     let private getJsonData (streamMessage: StreamMessage) =
         asyncResult { return! streamMessage.GetJsonData() }
 
-    let private getJsonDataAs (streamMessage: StreamMessage) =
-        asyncResult { return! streamMessage.GetJsonDataAs() }
+    let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
+        asyncResult {
+            let! json = getJsonData streamMessage
+            return Serializer.deserialize<'a> json
+        }
 
     type StreamMessage with
+        /// Gets the Json Data of the message. If prefetch is enabled, this will be a fast operation.
         member this.GetJsonData() = getJsonData this
-        member this.GetJsonDataAs() = getJsonDataAs this
+
+        /// Deserializes the json data using the bundled json serializer.
+        member this.GetJsonDataAs<'a>() = getJsonDataAs<'a> this
 
     // IStreamStore extensions
 
