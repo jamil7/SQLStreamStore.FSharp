@@ -28,6 +28,7 @@ type private NewStreamEventInternal<'a> =
 type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
 
 module NewStreamEvent =
+    
     /// Creates a NewStreamEvent with the following defaults:
     /// id = Guid.NewGuid()
     /// timestamp = DateTimeOffset.Now
