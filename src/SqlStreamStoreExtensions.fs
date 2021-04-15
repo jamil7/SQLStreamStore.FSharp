@@ -34,7 +34,7 @@ module SqlStreamExtensions =
 
     type IStreamStore with
 
-        ///Appends a collection of messages to a stream.
+        /// Appends a collection of messages to a stream.
         member this.AppendToStream(streamId, expectedVersion, messages, ?cancellationToken) =
             let cancellationToken' =
                 defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
