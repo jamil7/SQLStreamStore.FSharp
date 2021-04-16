@@ -14,18 +14,18 @@ type private Metadata =
         timestamp: DateTimeOffset
     }
 
-type private NewStreamEventInternal<'a> =
+type private NewStreamEventInternal<'event> =
     {
         author: string
         causationId: Guid option
         correlationId: Guid
-        data: 'a
+        data: 'event
         id: Guid
         metadata: string option
         timestamp: DateTimeOffset
     }
 
-type NewStreamEvent<'a> = private NewStreamEvent of NewStreamEventInternal<'a>
+type NewStreamEvent<'event> = private NewStreamEvent of NewStreamEventInternal<'event>
 
 module NewStreamEvent =
 
@@ -35,7 +35,7 @@ module NewStreamEvent =
     /// correlationId = Guid.NewGuid()
     /// causationId = None
     /// metadata = None
-    let create<'a> (author: string) (data: 'a) : NewStreamEvent<'a> =
+    let create<'event> (author: string) (data: 'event) : NewStreamEvent<'event> =
         NewStreamEvent
             {
                 author = author
@@ -47,30 +47,30 @@ module NewStreamEvent =
                 timestamp = DateTimeOffset.Now
             }
 
-    let withId (id: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withId (id: Guid) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with id = id }
 
-    let withTimestamp (timestamp: DateTimeOffset) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withTimestamp (timestamp: DateTimeOffset) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with timestamp = timestamp }
 
-    let withCorrelationId (correlationId: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withCorrelationId (correlationId: Guid) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) ->
             NewStreamEvent
                 { event with
                     correlationId = correlationId
                 }
 
-    let withCausationId (causationId: Guid) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withCausationId (causationId: Guid) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) ->
             NewStreamEvent
                 { event with
                     causationId = Some causationId
                 }
 
-    let withMetadata (metadata: string) : NewStreamEvent<'a> -> NewStreamEvent<'a> =
+    let withMetadata (metadata: string) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with metadata = Some metadata }
 
-    let internal toNewStreamMessage : NewStreamEvent<'a> -> NewStreamMessage =
+    let internal toNewStreamMessage : NewStreamEvent<'event> -> NewStreamMessage =
         fun (NewStreamEvent event) ->
             let metadata : Metadata =
                 {

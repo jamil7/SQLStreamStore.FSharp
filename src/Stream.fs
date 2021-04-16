@@ -155,10 +155,27 @@ module Get =
     let nextStreamVersion =
         apply (fun page -> page.NextStreamVersion)
 
-module Test =
-    let foo (store: IStreamStore) =
-        store
-        |> Stream.connect "name"
-        |> Read.entire
-        |> Get.isEnd
-        |> fun a -> a
+
+namespace SqlStreamStore.FSharp.EventSourcing
+
+open FSharp.Prelude
+open SqlStreamStore.FSharp
+open SqlStreamStore.Streams
+
+module Append =
+    let streamEvents'
+        (events: NewStreamEvent<'event> list)
+        (appendOptions: AppendOption list)
+        : Stream -> AsyncResult<AppendResult, exn> =
+        Append.streamMessages' (List.map NewStreamEvent.toNewStreamMessage events) appendOptions
+
+    let streamEvents (events: NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
+        streamEvents' events []
+
+module Get =
+    let events<'event> =
+        Get.messages
+        >> AsyncResult.map (
+            List.filter (fun msg -> msg.Type.Contains "Event::")
+            >> List.map StreamEvent.ofStreamMessage<'event>
+        )
