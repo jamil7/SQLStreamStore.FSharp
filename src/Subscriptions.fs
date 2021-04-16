@@ -133,6 +133,7 @@ open SqlStreamStore.Streams
 open System.Threading
 
 module Subscribe =
+    
     let toStreamEvents'
         (subscriptionName: string)
         (continueAfterVersion: int)
@@ -167,7 +168,6 @@ module Subscribe =
         (streamEventReceived: IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
         (streamSubOption: AllStreamSubOption list)
         : IStreamStore -> IAllStreamSubscription =
-
 
         let subs : IAllStreamSubscription -> StreamMessage -> CancellationToken -> Async<_> =
             fun iAllStreamSubscription msg cancellationToken ->
