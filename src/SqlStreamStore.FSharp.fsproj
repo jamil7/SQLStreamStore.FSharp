@@ -26,6 +26,7 @@
       <Compile Include="StreamEvent.fs" />
       <Compile Include="StreamStore.fs" />
       <Compile Include="Stream.fs" />
+      <Compile Include="Subscriptions.fs" />
     </ItemGroup>
     
 </Project>
