@@ -60,11 +60,10 @@ module Helpers =
 
             getOrAdd a f
 
-    let private unionToString' : 'a -> string =
-        fun a ->
-            Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
-            |> fst
-            |> fun case -> case.Name
+    let private unionToString' (a: 'a) : string =
+        Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
+        |> fst
+        |> fun case -> case.Name
 
     let internal unionToString<'a> : 'a -> string = memoize unionToString'
 
