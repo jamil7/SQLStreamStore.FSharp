@@ -14,8 +14,6 @@ type private StreamInternal =
 
 type Stream = private Stream of StreamInternal
 
-type StreamOptions = int
-
 module Stream =
     let connect streamId store =
         Stream { streamId = streamId; store = store }
