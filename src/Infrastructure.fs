@@ -68,9 +68,8 @@ module Helpers =
 
     let internal unionToString<'a> : 'a -> string = memoize unionToString'
 
-    let private getUnionCases'<'a> () : string list =
+    let private getEventUnionCases'<'a> () : string seq =
         Reflection.FSharpType.GetUnionCases typeof<'a>
-        |> Seq.map (fun info -> info.Name)
-        |> Seq.toList
+        |> Seq.map (fun info -> "Event" + info.Name)
 
-    let internal getUnionCases<'a> = memoize getUnionCases'<'a>
+    let internal getEventUnionCases<'a> = memoize getEventUnionCases'<'a>
