@@ -1,5 +1,6 @@
 namespace SqlStreamStore.FSharp
 
+open FSharp.Prelude
 open SqlStreamStore
 
 type PostgresConfig =
@@ -31,7 +32,10 @@ module NewStreamStore =
     /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
     let inMemoryStore : unit -> InMemoryStreamStore = fun _ -> new InMemoryStreamStore()
 
-    let postgresStore' (config: PostgresConfig) (postgresStoreOptions: PostgresStoreOptions list) =
+    let postgresStore'
+        (config: PostgresConfig)
+        (postgresStoreOptions: PostgresStoreOptions list)
+        : PostgresStreamStore =
 
         let mutable schema = None
         let mutable createSchemaIfNotExists = false
@@ -52,6 +56,12 @@ module NewStreamStore =
                 settings.Schema <- schema'
                 settings
 
-        new PostgresStreamStore(storeSettings) :> IStreamStore
+        new PostgresStreamStore(storeSettings)
 
     let postgresStore (config: PostgresConfig) = postgresStore' config []
+
+    let createSchemaIfNotExists (store: PostgresStreamStore) : AsyncResult<IStreamStore, exn> =
+        asyncResult {
+            do! store.CreateSchemaIfNotExists()
+            return store :> IStreamStore
+        }

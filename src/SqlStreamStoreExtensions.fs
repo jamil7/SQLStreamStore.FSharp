@@ -1,12 +1,10 @@
 namespace SqlStreamStore.FSharp
 
 open System.Threading
-open System.Threading.Tasks
 open FSharp.Prelude
 open SqlStreamStore
 open SqlStreamStore.Streams
 open System
-open SqlStreamStore.Subscriptions
 
 [<AutoOpen>]
 module SqlStreamExtensions =

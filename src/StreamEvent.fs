@@ -95,6 +95,7 @@ type StreamEvent<'event> =
         causationId: Guid option
         correlationId: Guid
         data: AsyncResult<'event, exn>
+        dataAsString: AsyncResult<string, exn>
         id: Guid
         metadata: string option
         position: int64
@@ -115,6 +116,7 @@ module StreamEvent =
             causationId = meta.causationId
             correlationId = meta.correlationId
             data = AsyncResult.map Serializer.deserialize<'event> (msg.GetJsonData())
+            dataAsString = msg.GetJsonData()
             id = msg.MessageId
             metadata = meta.meta
             position = msg.Position

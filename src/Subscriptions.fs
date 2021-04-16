@@ -1,11 +1,11 @@
 namespace SqlStreamStore.FSharp
 
-open System
-open System.Threading
-open System.Threading.Tasks
 open SqlStreamStore
 open SqlStreamStore.Streams
 open SqlStreamStore.Subscriptions
+open System
+open System.Threading
+open System.Threading.Tasks
 
 [<RequireQualifiedAccess>]
 type StreamSubOption =
@@ -133,7 +133,7 @@ open SqlStreamStore.Streams
 open System.Threading
 
 module Subscribe =
-    
+
     let toStreamEvents'
         (subscriptionName: string)
         (continueAfterVersion: int)
