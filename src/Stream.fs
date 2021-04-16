@@ -17,21 +17,8 @@ type Stream = private Stream of StreamData
 type StreamOptions = int
 
 module Stream =
-    let mutable readPage : ReadStreamPage option = None
-
-    let private apply f = Option.map f readPage
-
     let connect streamId store =
         Stream { streamId = streamId; store = store }
-
-    let messages =
-        apply (fun page -> page.Messages |> Array.toList)
-
-    let status = apply (fun page -> page.Status)
-
-    let isEnd = apply (fun page -> page.IsEnd)
-
-    let readDirection = apply (fun page -> page.ReadDirection)
 
 
 [<RequireQualifiedAccess>]
@@ -59,6 +46,7 @@ module Append =
     let streamMessages (messages: NewStreamMessage list) : Stream -> AsyncResult<AppendResult, exn> =
         streamMessages' messages []
 
+
 [<RequireQualifiedAccess>]
 type ReadPartialOption =
     | ReadDirection of ReadDirection
@@ -77,7 +65,6 @@ type ReadEntireOption =
 module Read =
 
     let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
-
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
         let mutable messageCount = 1000
@@ -143,4 +130,7 @@ module Read =
 
 module Test =
     let foo (store: IStreamStore) =
-        store |> Stream.connect "name" |> fun a -> a
+        store
+        |> Stream.connect "name"
+        |> Read.entire
+        |> fun a -> a
