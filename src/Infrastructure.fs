@@ -48,7 +48,6 @@ module internal Serializer =
         DefaultSerializationConfig<'a>.deserialize
 
 
-
 [<AutoOpen>]
 module Helpers =
 
@@ -82,6 +81,6 @@ module Helpers =
 
     let private getEventUnionCases'<'a> () : string seq =
         Reflection.FSharpType.GetUnionCases typeof<'a>
-        |> Seq.map (fun info -> "Event" + info.Name)
+        |> Seq.map (fun info -> eventPrefix + info.Name)
 
     let internal getEventUnionCases<'a> = memoize getEventUnionCases'<'a>
