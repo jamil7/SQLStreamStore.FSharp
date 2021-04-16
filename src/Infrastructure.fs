@@ -47,11 +47,15 @@ module internal Serializer =
     let deserialize<'a> : string -> Result<'a, exn> =
         DefaultSerializationConfig<'a>.deserialize
 
+
+
 [<AutoOpen>]
 module Helpers =
 
     open System
     open System.Threading
+
+    let internal eventPrefix = "Event::"
 
     let private memoize (f: 'a -> 'b) (a: 'a) : 'b =
         let cache =

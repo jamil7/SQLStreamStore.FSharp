@@ -183,6 +183,6 @@ module Get =
     let events<'event> =
         Get.messages
         >> AsyncResult.map (
-            List.filter (fun msg -> msg.Type.Contains "Event::")
+            List.filter (fun msg -> msg.Type.Contains eventPrefix)
             >> List.map StreamEvent.ofStreamMessage<'event>
         )

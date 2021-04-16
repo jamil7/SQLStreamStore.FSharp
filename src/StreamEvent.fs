@@ -84,7 +84,7 @@ module NewStreamEvent =
             result {
                 let! data' = Serializer.serialize event.data
                 let! metadata' = Serializer.serialize metadata
-                return NewStreamMessage(event.id, "Event::" + unionToString event.data, data', metadata')
+                return NewStreamMessage(event.id, eventPrefix + unionToString event.data, data', metadata')
             }
 
 
