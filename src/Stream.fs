@@ -1,5 +1,6 @@
 namespace SqlStreamStore.FSharp
 
+open System
 open System.Threading
 open FSharp.Prelude
 open SqlStreamStore
@@ -59,31 +60,48 @@ module Append =
         streamMessages' messages []
 
 [<RequireQualifiedAccess>]
-type ReadOption =
+type ReadPartialOption =
     | ReadDirection of ReadDirection
-    | FromVersionInclusive of uint
+    | FromVersionInclusive of int
     | MessageCount of int
+    | NoPrefetch
+    | CancellationToken of CancellationToken
+
+[<RequireQualifiedAccess>]
+type ReadEntireOption =
+    | ReadDirection of ReadDirection
+    | FromVersionInclusive of int
     | NoPrefetch
     | CancellationToken of CancellationToken
 
 module Read =
 
-    let partial' (readOptions: ReadOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+    let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+
+        let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
+        let mutable fromVersionInclusive : int option = None
+        let mutable messageCount = 1000
+        let mutable prefetch = true
+        let mutable readDirection = ReadDirection.Forward
+
+        readOptions
+        |> List.iter
+            (function
+            | ReadPartialOption.ReadDirection direction -> readDirection <- direction
+            | ReadPartialOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
+            | ReadPartialOption.MessageCount count -> messageCount <- count
+            | ReadPartialOption.NoPrefetch -> prefetch <- false
+            | ReadPartialOption.CancellationToken token -> cancellationToken <- token)
+
+        let fromVersionInclusive' =
+            match readDirection, fromVersionInclusive with
+            | ReadDirection.Forward, None -> StreamVersion.Start
+            | ReadDirection.Forward, Some index -> index
+            | ReadDirection.Backward, None -> StreamVersion.End
+            | ReadDirection.Backward, Some index -> index
+            | _ -> failwith "Illegal ReadDirection enum."
+
         fun (Stream stream) ->
-            let mutable readDirection = ReadDirection.Forward
-            let mutable prefetch = true
-            let mutable messageCount = 1000
-            let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
-            let mutable fromVersionInclusive : int option = None
-
-            let fromVersionInclusive' =
-                match readDirection, fromVersionInclusive with
-                | ReadDirection.Forward, None -> StreamVersion.Start
-                | ReadDirection.Forward, Some index -> int index
-                | ReadDirection.Backward, None -> StreamVersion.End
-                | ReadDirection.Backward, Some index -> int index
-                | _ -> failwith "Illegal ReadDirection enum."
-
             match readDirection with
             | ReadDirection.Forward ->
                 stream.store.ReadStreamForwards(
@@ -94,8 +112,34 @@ module Read =
                     cancellationToken
                 )
             | ReadDirection.Backward ->
-                store.ReadStreamBackwards(StreamId(name), fromVersionInclusive', messageCount', prefetch')
+                stream.store.ReadStreamBackwards(
+                    stream.streamId,
+                    fromVersionInclusive',
+                    messageCount,
+                    prefetch,
+                    cancellationToken
+                )
             | _ -> failwith "Illegal ReadDirection enum."
+
+    let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
+
+    let entire' (readOptions: ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+        let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
+        let mutable fromVersionInclusive : int option = None
+        let mutable prefetch = true
+        let mutable readDirection = ReadDirection.Forward
+
+        readOptions
+        |> List.iter
+            (function
+            | ReadEntireOption.ReadDirection direction -> readDirection <- direction
+            | ReadEntireOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
+            | ReadEntireOption.NoPrefetch -> prefetch <- false
+            | ReadEntireOption.CancellationToken token -> cancellationToken <- token)
+
+        partial' [ ReadPartialOption.MessageCount Int32.MaxValue ]
+
+    let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
 
 module Test =
     let foo (store: IStreamStore) =
