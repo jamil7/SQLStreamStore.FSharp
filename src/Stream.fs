@@ -6,13 +6,13 @@ open SqlStreamStore.Streams
 open System
 open System.Threading
 
-type private StreamData =
+type private StreamInternal =
     {
-        streamId: string
         store: IStreamStore
+        streamId: string
     }
 
-type Stream = private Stream of StreamData
+type Stream = private Stream of StreamInternal
 
 type StreamOptions = int
 
