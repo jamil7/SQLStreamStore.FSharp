@@ -182,7 +182,7 @@ module SqlStreamExtensions =
             let cancellationToken' =
                 defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
 
-            asyncResult { return! readHeadPosition this cancellationToken' }
+            readHeadPosition this cancellationToken'
 
         /// Reads messages from a stream forwards.
         member this.ReadStreamForwards(streamId, ?fromVersionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
@@ -195,6 +195,7 @@ module SqlStreamExtensions =
 
             let cancellationToken' =
                 defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
 
             readStreamForwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
 
@@ -210,6 +211,7 @@ module SqlStreamExtensions =
             let cancellationToken' =
                 defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
 
+
             readStreamBackwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
 
         /// Lists Streams in SQLStreamStore.
@@ -219,7 +221,7 @@ module SqlStreamExtensions =
 
             let continuationToken' = defaultArg continuationToken null
 
-            asyncResult { return! listAllStreams this maxCount' continuationToken' }
+            listAllStreams this maxCount' continuationToken'
 
         /// List all the streams in the stream store.
         /// N(streams_that_can_be_retrieved) <= Int.Max
