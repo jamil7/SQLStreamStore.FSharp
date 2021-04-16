@@ -43,22 +43,21 @@ module Helpers =
     open System
     open System.Threading
 
-    let private memoize : ('a -> 'b) -> 'a -> 'b =
-        fun f a ->
-            let cache =
-                System.Collections.Concurrent.ConcurrentDictionary<'a, Lazy<'b>>()
+    let private memoize (f: 'a -> 'b) (a: 'a) : 'b =
+        let cache =
+            System.Collections.Concurrent.ConcurrentDictionary<'a, Lazy<'b>>()
 
-            let getOrAdd (a: 'a) (f: 'a -> 'b) =
-                let lazyRes =
-                    cache.GetOrAdd(
-                        a,
-                        (fun a ->
-                            Lazy<'b>(valueFactory = (fun _ -> f a), mode = LazyThreadSafetyMode.ExecutionAndPublication))
-                    )
+        let getOrAdd (a: 'a) (f: 'a -> 'b) =
+            let lazyRes =
+                cache.GetOrAdd(
+                    a,
+                    (fun a ->
+                        Lazy<'b>(valueFactory = (fun _ -> f a), mode = LazyThreadSafetyMode.ExecutionAndPublication))
+                )
 
-                lazyRes.Value
+            lazyRes.Value
 
-            getOrAdd a f
+        getOrAdd a f
 
     let private unionToString' (a: 'a) : string =
         Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
