@@ -40,6 +40,7 @@ module internal Serializer =
 [<AutoOpen>]
 module Helpers =
 
+    open System
     open System.Threading
 
     let private memoize : ('a -> 'b) -> 'a -> 'b =
@@ -66,3 +67,10 @@ module Helpers =
             |> fun case -> case.Name
 
     let internal unionToString<'a> : 'a -> string = memoize unionToString'
+
+    let private getUnionCases'<'a> () : string list =
+        Reflection.FSharpType.GetUnionCases typeof<'a>
+        |> Seq.map (fun info -> info.Name)
+        |> Seq.toList
+
+    let internal getUnionCases<'a> = memoize getUnionCases'<'a>
