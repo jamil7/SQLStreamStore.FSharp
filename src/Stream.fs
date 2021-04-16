@@ -128,9 +128,37 @@ module Read =
 
     let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
 
+module Get =
+    let private apply f (readStreamPage: AsyncResult<ReadStreamPage, exn>) =
+        asyncResult {
+            let! page = readStreamPage
+            return f page
+        }
+
+    let messages =
+        apply (fun page -> page.Messages |> Array.toList)
+
+    let status = apply (fun page -> page.Status)
+
+    let isEnd = apply (fun page -> page.IsEnd)
+
+    let readDirection = apply (fun page -> page.ReadDirection)
+
+    let streamId = apply (fun page -> page.StreamId)
+
+    let fromStreamVersion =
+        apply (fun page -> page.FromStreamVersion)
+
+    let lastStreamPosition =
+        apply (fun page -> page.LastStreamPosition)
+
+    let nextStreamVersion =
+        apply (fun page -> page.NextStreamVersion)
+
 module Test =
     let foo (store: IStreamStore) =
         store
         |> Stream.connect "name"
         |> Read.entire
+        |> Get.isEnd
         |> fun a -> a
