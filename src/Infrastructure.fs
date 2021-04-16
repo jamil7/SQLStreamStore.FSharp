@@ -65,4 +65,4 @@ module Helpers =
             |> fst
             |> fun case -> case.Name
 
-    let internal unionToString : 'a -> string = fun a -> memoize unionToString' a
+    let internal unionToString<'a> : 'a -> string = memoize unionToString'
