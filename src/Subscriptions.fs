@@ -73,7 +73,7 @@ module Subscribe =
         : Stream -> IStreamSubscription =
         toStreamMessages' subscriptionName continueAfterVersion streamMessageReceived []
 
-    let toAllStreamMessages
+    let toAllStreamMessages'
         (subscriptionName: string)
         (continueAfterPosition: int64)
         (streamMessageReceived: IAllStreamSubscription -> StreamMessage -> CancellationToken -> Async<_>)
@@ -116,6 +116,14 @@ module Subscribe =
             sub.MaxCountPerRead <- maxCountPerRead
             sub
 
+    let toAllStreamMessages
+        (subscriptionName: string)
+        (continueAfterPosition: int64)
+        (streamMessageReceived: IAllStreamSubscription -> StreamMessage -> CancellationToken -> Async<_>)
+        : IStreamStore -> IAllStreamSubscription =
+
+        toAllStreamMessages' subscriptionName continueAfterPosition streamMessageReceived []
+
 namespace SqlStreamStore.FSharp.EventSourcing
 
 open FSharp.Prelude
@@ -128,17 +136,17 @@ module Subscribe =
     let toStreamEvents'
         (subscriptionName: string)
         (continueAfterVersion: int)
-        (streamMessageReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
+        (streamEventReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
         (streamSubOption: StreamSubOption list)
         : Stream -> IStreamSubscription =
 
         let subs : IStreamSubscription -> StreamMessage -> CancellationToken -> Async<_> =
             fun iStreamSubscription msg cancellationToken ->
-                if List.contains msg.Type (getUnionCases<'event> ()) then
-                    streamMessageReceived
-                        iStreamSubscription
-                        (StreamEvent.ofStreamMessage<'event> msg)
-                        cancellationToken
+                if List.contains
+                    msg.Type
+                    (getUnionCases<'event> ()
+                     |> List.map ((+) "Event::")) then
+                    streamEventReceived iStreamSubscription (StreamEvent.ofStreamMessage<'event> msg) cancellationToken
                 else
                     Async.singleton ()
 
@@ -147,7 +155,40 @@ module Subscribe =
     let toStreamEvents
         (subscriptionName: string)
         (continueAfterVersion: int)
-        (streamMessageReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
+        (streamEventReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
         : Stream -> IStreamSubscription =
 
-        toStreamEvents' subscriptionName continueAfterVersion streamMessageReceived []
+        toStreamEvents' subscriptionName continueAfterVersion streamEventReceived []
+
+
+    let toAllStreamEvents'<'event>
+        (subscriptionName: string)
+        (continueAfterPosition: int64)
+        (streamEventReceived: IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
+        (streamSubOption: AllStreamSubOption list)
+        : IStreamStore -> IAllStreamSubscription =
+
+
+        let subs : IAllStreamSubscription -> StreamMessage -> CancellationToken -> Async<_> =
+            fun iAllStreamSubscription msg cancellationToken ->
+                if List.contains
+                    msg.Type
+                    (getUnionCases<'event> ()
+                     |> List.map ((+) "Event::")) then
+                    streamEventReceived
+                        iAllStreamSubscription
+                        (StreamEvent.ofStreamMessage<'event> msg)
+                        cancellationToken
+                else
+                    Async.singleton ()
+
+
+        Subscribe.toAllStreamMessages' subscriptionName continueAfterPosition subs streamSubOption
+
+    let toAllStreamEvents<'event>
+        (subscriptionName: string)
+        (continueAfterPosition: int64)
+        (streamEventReceived: IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> Async<_>)
+        : IStreamStore -> IAllStreamSubscription =
+
+        toAllStreamEvents' subscriptionName continueAfterPosition streamEventReceived []
