@@ -166,7 +166,15 @@ module Append =
         (events: NewStreamEvent<'event> list)
         (appendOptions: AppendOption list)
         : Stream -> AsyncResult<AppendResult, exn> =
-        Append.streamMessages' (List.map NewStreamEvent.toNewStreamMessage events) appendOptions
+        fun stream ->
+            asyncResult {
+                let! messages =
+                    List.map NewStreamEvent.toNewStreamMessage events
+                    |> Result.sequence
+
+                return! Append.streamMessages' messages appendOptions stream
+            }
+
 
     let streamEvents (events: NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
         streamEvents' events []

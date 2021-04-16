@@ -7,8 +7,8 @@ module SerializationConfig =
 
     type SerializerConfig<'a> =
         {
-            serialize: 'a -> string
-            deserialize: string -> 'a
+            serialize: 'a -> Result<string, exn>
+            deserialize: string -> Result<'a, exn>
         }
 
     let private opt =
@@ -23,19 +23,29 @@ module SerializationConfig =
 
     do opt.Converters.Add converterOpt
 
-    let DefaultSerializationConfig : SerializerConfig<'a> =
+    let private protect (f: 'a -> 'b) x =
+        try
+            Ok(f x)
+        with e -> Error e
+
+    let DefaultSerializationConfig<'a> : SerializerConfig<'a> =
         {
-            serialize = fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
-            deserialize = fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt)
+            serialize =
+                protect
+                <| fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
+            deserialize =
+                protect
+                <| fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt)
         }
 
 module internal Serializer =
 
     open SerializationConfig
 
-    let serialize<'a> : 'a -> string = DefaultSerializationConfig.serialize
+    let serialize<'a> : 'a -> Result<string, exn> = DefaultSerializationConfig<'a>.serialize
 
-    let deserialize<'a> : string -> 'a = DefaultSerializationConfig.deserialize
+    let deserialize<'a> : string -> Result<'a, exn> =
+        DefaultSerializationConfig<'a>.deserialize
 
 [<AutoOpen>]
 module Helpers =

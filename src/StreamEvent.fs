@@ -70,7 +70,7 @@ module NewStreamEvent =
     let withMetadata (metadata: string) : NewStreamEvent<'event> -> NewStreamEvent<'event> =
         fun (NewStreamEvent event) -> NewStreamEvent { event with metadata = Some metadata }
 
-    let internal toNewStreamMessage : NewStreamEvent<'event> -> NewStreamMessage =
+    let internal toNewStreamMessage : NewStreamEvent<'event> -> Result<NewStreamMessage, exn> =
         fun (NewStreamEvent event) ->
             let metadata : Metadata =
                 {
@@ -81,12 +81,12 @@ module NewStreamEvent =
                     timestamp = event.timestamp
                 }
 
-            NewStreamMessage(
-                event.id,
-                "Event::" + unionToString event.data,
-                Serializer.serialize event.data,
-                Serializer.serialize metadata
-            )
+            result {
+                let! data' = Serializer.serialize event.data
+                let! metadata' = Serializer.serialize metadata
+                return NewStreamMessage(event.id, "Event::" + unionToString event.data, data', metadata')
+            }
+
 
 [<Struct>]
 type StreamEvent<'event> =
@@ -107,21 +107,29 @@ type StreamEvent<'event> =
 
 module StreamEvent =
 
-    let ofStreamMessage<'event> (msg: StreamMessage) : StreamEvent<'event> =
-        let meta =
-            Serializer.deserialize<Metadata> msg.JsonMetadata
+    let ofStreamMessage<'event> (msg: StreamMessage) : Result<StreamEvent<'event>, exn> =
+        result {
+            let! meta = Serializer.deserialize<Metadata> msg.JsonMetadata
 
-        {
-            author = meta.author
-            causationId = meta.causationId
-            correlationId = meta.correlationId
-            data = AsyncResult.map Serializer.deserialize<'event> (msg.GetJsonData())
-            dataAsString = msg.GetJsonData()
-            id = msg.MessageId
-            metadata = meta.meta
-            position = msg.Position
-            streamId = msg.StreamId
-            streamVersion = msg.StreamVersion
-            timestamp = meta.timestamp
-            typeAsString = msg.Type
+            let data' =
+                asyncResult {
+                    let! json = msg.GetJsonData()
+                    return! Serializer.deserialize<'event> json
+                }
+
+            return
+                {
+                    author = meta.author
+                    causationId = meta.causationId
+                    correlationId = meta.correlationId
+                    data = data'
+                    dataAsString = msg.GetJsonData()
+                    id = msg.MessageId
+                    metadata = meta.meta
+                    position = msg.Position
+                    streamId = msg.StreamId
+                    streamVersion = msg.StreamVersion
+                    timestamp = meta.timestamp
+                    typeAsString = msg.Type
+                }
         }

@@ -143,10 +143,13 @@ module Subscribe =
 
         let subs : IStreamSubscription -> StreamMessage -> CancellationToken -> Async<_> =
             fun iStreamSubscription msg cancellationToken ->
-                if Seq.contains msg.Type (getEventUnionCases<'event> ()) then
-                    streamEventReceived iStreamSubscription (StreamEvent.ofStreamMessage<'event> msg) cancellationToken
-                else
-                    Async.singleton ()
+                asyncResult {
+                    if Seq.contains msg.Type (getEventUnionCases<'event> ()) then
+                        let! event = StreamEvent.ofStreamMessage<'event> msg
+                        return streamEventReceived iStreamSubscription event cancellationToken
+                    else
+                        return Async.singleton ()
+                }
 
         Subscribe.toStreamMessages' subscriptionName continueAfterVersion subs streamSubOption
 
@@ -168,14 +171,13 @@ module Subscribe =
 
         let subs : IAllStreamSubscription -> StreamMessage -> CancellationToken -> Async<_> =
             fun iAllStreamSubscription msg cancellationToken ->
-                if Seq.contains msg.Type (getEventUnionCases<'event> ()) then
-                    streamEventReceived
-                        iAllStreamSubscription
-                        (StreamEvent.ofStreamMessage<'event> msg)
-                        cancellationToken
-                else
-                    Async.singleton ()
-
+                asyncResult {
+                    if Seq.contains msg.Type (getEventUnionCases<'event> ()) then
+                        let! event = StreamEvent.ofStreamMessage<'event> msg
+                        return streamEventReceived iAllStreamSubscription event cancellationToken
+                    else
+                        return Async.singleton ()
+                }
 
         Subscribe.toAllStreamMessages' subscriptionName continueAfterPosition subs streamSubOption
 
