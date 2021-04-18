@@ -3,7 +3,6 @@ namespace SqlStreamStore.FSharp
 open FSharp.Prelude
 open SqlStreamStore
 open SqlStreamStore.Streams
-open System
 open System.Threading
 
 type private StreamInternal =
@@ -29,6 +28,7 @@ module Append =
         (messages: NewStreamMessage list)
         (appendOptions: AppendOption list)
         : Stream -> AsyncResult<AppendResult, exn> =
+
         let mutable expectedVersion = ExpectedVersion.Any
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
 
@@ -63,6 +63,7 @@ type ReadEntireOption =
 module Read =
 
     let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
         let mutable messageCount = 1000
@@ -109,6 +110,7 @@ module Read =
     let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
 
     let entire' (readOptions: ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
         let mutable prefetch = true
@@ -122,37 +124,44 @@ module Read =
             | ReadEntireOption.NoPrefetch -> prefetch <- false
             | ReadEntireOption.ReadDirection direction -> readDirection <- direction)
 
-        partial' [ ReadPartialOption.MessageCount Int32.MaxValue ]
+        partial' [ ReadPartialOption.MessageCount System.Int32.MaxValue ]
 
     let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
 
+
 module Get =
 
-    let private apply f (readStreamPage: AsyncResult<ReadStreamPage, exn>) =
-        asyncResult {
-            let! page = readStreamPage
-            return f page
-        }
+    let private curriedMap : (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
+        AsyncResult.map
 
     let messages =
-        apply (fun page -> page.Messages |> Array.toList)
+        curriedMap (fun page -> page.Messages |> Array.toList)
 
-    let status = apply (fun page -> page.Status)
+    let messagesData =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonData()))
 
-    let isEnd = apply (fun page -> page.IsEnd)
+    let messagesDataAs<'data> =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonDataAs<'data>()))
 
-    let readDirection = apply (fun page -> page.ReadDirection)
+    let status = curriedMap (fun page -> page.Status)
 
-    let streamId = apply (fun page -> page.StreamId)
+    let isEnd = curriedMap (fun page -> page.IsEnd)
+
+    let readDirection =
+        curriedMap (fun page -> page.ReadDirection)
+
+    let streamId = curriedMap (fun page -> page.StreamId)
 
     let fromStreamVersion =
-        apply (fun page -> page.FromStreamVersion)
+        curriedMap (fun page -> page.FromStreamVersion)
 
     let lastStreamPosition =
-        apply (fun page -> page.LastStreamPosition)
+        curriedMap (fun page -> page.LastStreamPosition)
 
     let nextStreamVersion =
-        apply (fun page -> page.NextStreamVersion)
+        curriedMap (fun page -> page.NextStreamVersion)
 
 
 namespace SqlStreamStore.FSharp.EventSourcing
@@ -166,23 +175,30 @@ module Append =
         (events: NewStreamEvent<'event> list)
         (appendOptions: AppendOption list)
         : Stream -> AsyncResult<AppendResult, exn> =
+
         fun stream ->
-            asyncResult {
-                let! messages =
-                    List.map NewStreamEvent.toNewStreamMessage events
-                    |> Result.sequence
-
-                return! Append.streamMessages' messages appendOptions stream
-            }
-
+            List.traverseResultM NewStreamEvent.toNewStreamMessage events
+            |> Async.singleton
+            |> AsyncResult.bind (fun messages -> Append.streamMessages' messages appendOptions stream)
 
     let streamEvents (events: NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
         streamEvents' events []
 
 module Get =
+
     let events<'event> =
         Get.messages
-        >> AsyncResult.map (
-            List.filter (fun msg -> msg.Type.Contains eventPrefix)
-            >> List.map StreamEvent.ofStreamMessage<'event>
+        >> Async.map (
+            Result.bind (
+                List.filter (fun msg -> msg.Type.Contains eventPrefix)
+                >> List.traverseResultM StreamEvent.ofStreamMessage<'event>
+            )
         )
+
+    let eventsData<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
+
+    let eventsDataAsString<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.dataAsString))
