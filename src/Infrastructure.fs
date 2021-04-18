@@ -51,9 +51,6 @@ module internal Serializer =
 [<AutoOpen>]
 module Helpers =
 
-    open System
-    open System.Threading
-
     let internal eventPrefix = "Event::"
 
     let private memoize (f: 'a -> 'b) (a: 'a) : 'b =
@@ -65,7 +62,10 @@ module Helpers =
                 cache.GetOrAdd(
                     a,
                     (fun a ->
-                        Lazy<'b>(valueFactory = (fun _ -> f a), mode = LazyThreadSafetyMode.ExecutionAndPublication))
+                        Lazy<'b>(
+                            valueFactory = (fun _ -> f a),
+                            mode = System.Threading.LazyThreadSafetyMode.PublicationOnly
+                        ))
                 )
 
             lazyRes.Value
@@ -83,4 +83,4 @@ module Helpers =
         Reflection.FSharpType.GetUnionCases typeof<'a>
         |> Seq.map (fun info -> eventPrefix + info.Name)
 
-    let internal getEventUnionCases<'a> = memoize getEventUnionCases'<'a>
+    let internal getEventUnionCases<'a> = memoize id getEventUnionCases'<'a>
