@@ -4,7 +4,6 @@ open FSharp.Prelude
 open SqlStreamStore
 open SqlStreamStore.Streams
 open SqlStreamStore.Subscriptions
-open System
 open System.Threading
 open System.Threading.Tasks
 
@@ -24,10 +23,10 @@ type AllStreamSubOption =
 
 module Subscribe =
     let toStreamMessages'
-        (subscriptionName: string)
-        (continueAfterVersion: int)
-        (streamMessageReceived: IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: StreamSubOption list)
+        (subscriptionName : string)
+        (continueAfterVersion : int)
+        (streamMessageReceived : IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
+        (streamSubOption : StreamSubOption list)
         : Stream -> IStreamSubscription =
 
         let mutable hasCaughtUp = null
@@ -56,7 +55,7 @@ module Subscribe =
             let sub =
                 stream.store.SubscribeToStream(
                     streamId = StreamId stream.streamId,
-                    continueAfterVersion = Nullable continueAfterVersion,
+                    continueAfterVersion = System.Nullable continueAfterVersion,
                     streamMessageReceived = streamMessageReceived',
                     subscriptionDropped = subscriptionDropped,
                     hasCaughtUp = hasCaughtUp,
@@ -68,17 +67,17 @@ module Subscribe =
             sub
 
     let toStreamMessages
-        (subscriptionName: string)
-        (continueAfterVersion: int)
-        (streamMessageReceived: IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
+        (subscriptionName : string)
+        (continueAfterVersion : int)
+        (streamMessageReceived : IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
         : Stream -> IStreamSubscription =
         toStreamMessages' subscriptionName continueAfterVersion streamMessageReceived []
 
     let toAllStreamMessages'
-        (subscriptionName: string)
-        (continueAfterPosition: int64)
-        (streamMessageReceived: IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: AllStreamSubOption list)
+        (subscriptionName : string)
+        (continueAfterPosition : int64)
+        (streamMessageReceived : IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
+        (streamSubOption : AllStreamSubOption list)
         : IStreamStore -> IAllStreamSubscription =
 
         let mutable hasCaughtUp = null
@@ -106,7 +105,7 @@ module Subscribe =
         fun store ->
             let sub =
                 store.SubscribeToAll(
-                    continueAfterPosition = Nullable continueAfterPosition,
+                    continueAfterPosition = System.Nullable continueAfterPosition,
                     streamMessageReceived = streamMessageReceived',
                     subscriptionDropped = subscriptionDropped,
                     hasCaughtUp = hasCaughtUp,
@@ -118,9 +117,9 @@ module Subscribe =
             sub
 
     let toAllStreamMessages
-        (subscriptionName: string)
-        (continueAfterPosition: int64)
-        (streamMessageReceived: IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
+        (subscriptionName : string)
+        (continueAfterPosition : int64)
+        (streamMessageReceived : IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
         : IStreamStore -> IAllStreamSubscription =
 
         toAllStreamMessages' subscriptionName continueAfterPosition streamMessageReceived []
@@ -137,10 +136,10 @@ open System.Threading
 module Subscribe =
 
     let toStreamEvents'
-        (subscriptionName: string)
-        (continueAfterVersion: int)
-        (streamEventReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: StreamSubOption list)
+        (subscriptionName : string)
+        (continueAfterVersion : int)
+        (streamEventReceived : IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
+        (streamSubOption : StreamSubOption list)
         : Stream -> IStreamSubscription =
 
         let subs : IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _> =
@@ -156,19 +155,19 @@ module Subscribe =
         Subscribe.toStreamMessages' subscriptionName continueAfterVersion subs streamSubOption
 
     let toStreamEvents
-        (subscriptionName: string)
-        (continueAfterVersion: int)
-        (streamEventReceived: IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
+        (subscriptionName : string)
+        (continueAfterVersion : int)
+        (streamEventReceived : IStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
         : Stream -> IStreamSubscription =
 
         toStreamEvents' subscriptionName continueAfterVersion streamEventReceived []
 
 
     let toAllStreamEvents'<'event>
-        (subscriptionName: string)
-        (continueAfterPosition: int64)
-        (streamEventReceived: IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: AllStreamSubOption list)
+        (subscriptionName : string)
+        (continueAfterPosition : int64)
+        (streamEventReceived : IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
+        (streamSubOption : AllStreamSubOption list)
         : IStreamStore -> IAllStreamSubscription =
 
         let subs : IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _> =
@@ -184,9 +183,9 @@ module Subscribe =
         Subscribe.toAllStreamMessages' subscriptionName continueAfterPosition subs streamSubOption
 
     let toAllStreamEvents<'event>
-        (subscriptionName: string)
-        (continueAfterPosition: int64)
-        (streamEventReceived: IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
+        (subscriptionName : string)
+        (continueAfterPosition : int64)
+        (streamEventReceived : IAllStreamSubscription -> StreamEvent<'event> -> CancellationToken -> AsyncResult<_, _>)
         : IStreamStore -> IAllStreamSubscription =
 
         toAllStreamEvents' subscriptionName continueAfterPosition streamEventReceived []

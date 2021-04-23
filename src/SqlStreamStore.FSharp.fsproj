@@ -24,9 +24,12 @@
       <Compile Include="Infrastructure.fs" />
       <Compile Include="SqlStreamStoreExtensions.fs" />
       <Compile Include="StreamEvent.fs" />
-      <Compile Include="StreamStore.fs" />
-      <Compile Include="Stream.fs" />
-      <Compile Include="Subscriptions.fs" />
+      <Compile Include="Create.fs" />
+      <Compile Include="Connect.fs" />
+      <Compile Include="Append.fs" />
+      <Compile Include="Read.fs" />
+      <Compile Include="Get.fs" />
+      <Compile Include="Subscribe.fs" />
     </ItemGroup>
     
 </Project>

@@ -11,13 +11,13 @@ module SqlStreamExtensions =
 
     // StreamMessage extensions
 
-    let private getJsonData (streamMessage: StreamMessage) =
+    let private getJsonData (streamMessage : StreamMessage) =
         asyncResult { return! streamMessage.GetJsonData() }
 
-    let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
+    let private getJsonDataAs<'a> (streamMessage : StreamMessage) =
         asyncResult {
             let! json = getJsonData streamMessage
-            return Serializer.deserialize<'a> json
+            return JayJson.decode<'a> json
         }
 
     type StreamMessage with
@@ -29,26 +29,26 @@ module SqlStreamExtensions =
 
     // IStreamStore extensions
 
-    let private listAllStreams (store: IStreamStore) (maxCount: int) (continuationToken: string) =
+    let private listAllStreams (store : IStreamStore) (maxCount : int) (continuationToken : string) =
         asyncResult { return! store.ListStreams(maxCount, continuationToken) }
 
-    let private readHeadPosition (store: IStreamStore) cancellationToken =
+    let private readHeadPosition (store : IStreamStore) cancellationToken =
         asyncResult { return! store.ReadHeadPosition cancellationToken }
 
-    let private appendToStream (store: IStreamStore) streamId expectedVersion messages cancellationToken =
+    let private appendToStream (store : IStreamStore) streamId expectedVersion messages cancellationToken =
         asyncResult { return! store.AppendToStream(StreamId streamId, expectedVersion, messages, cancellationToken) }
 
-    let private deleteMessage (store: IStreamStore) streamId msgId cancellationToken =
+    let private deleteMessage (store : IStreamStore) streamId msgId cancellationToken =
         asyncResult { return! store.DeleteMessage(StreamId streamId, msgId, cancellationToken) }
 
-    let private deleteStream (store: IStreamStore) streamId version cancellationToken =
+    let private deleteStream (store : IStreamStore) streamId version cancellationToken =
         asyncResult { return! store.DeleteStream(StreamId streamId, version, cancellationToken) }
 
-    let private getStreamMetadata (store: IStreamStore) streamId cancellationToken =
+    let private getStreamMetadata (store : IStreamStore) streamId cancellationToken =
         asyncResult { return! store.GetStreamMetadata(streamId, cancellationToken) }
 
     let private readStreamForwards
-        (store: IStreamStore)
+        (store : IStreamStore)
         streamId
         fromVersionInclusive
         maxCount
@@ -67,7 +67,7 @@ module SqlStreamExtensions =
         }
 
     let private readStreamBackwards
-        (store: IStreamStore)
+        (store : IStreamStore)
         streamId
         fromVersionInclusive
         maxCount
@@ -85,8 +85,28 @@ module SqlStreamExtensions =
                 )
         }
 
+    let private readAllForwards
+        (store : IStreamStore)
+        fromPositionInclusive
+        maxCount
+        prefetchJsonData
+        cancellationToken
+        =
+        asyncResult {
+            return! store.ReadAllForwards(fromPositionInclusive, maxCount, prefetchJsonData, cancellationToken) }
+
+    let private readAllBackwards
+        (store : IStreamStore)
+        fromPositionInclusive
+        maxCount
+        prefetchJsonData
+        cancellationToken
+        =
+        asyncResult {
+            return! store.ReadAllBackwards(fromPositionInclusive, maxCount, prefetchJsonData, cancellationToken) }
+
     let private setStreamMetadata
-        (store: IStreamStore)
+        (store : IStreamStore)
         streamId
         expectedStreamMetadataVersion
         maxAge
@@ -145,8 +165,8 @@ module SqlStreamExtensions =
             (
                 streamId,
                 ?expectedStreamMetadataVersion,
-                ?maxAge: int,
-                ?maxCount: int,
+                ?maxAge : int,
+                ?maxCount : int,
                 ?metadataJson,
                 ?cancellationToken
             ) =
@@ -184,6 +204,51 @@ module SqlStreamExtensions =
 
             readHeadPosition this cancellationToken'
 
+        /// Reads messages from all streams forwards.
+        member this.ReadAllForwards(?fromPositionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
+            let fromPositionInclusive' =
+                defaultArg fromPositionInclusive Position.Start
+
+            let maxCount' = defaultArg maxCount 1000
+
+            let prefetch' = defaultArg prefetch true
+
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+
+            readAllForwards this fromPositionInclusive' maxCount' prefetch' cancellationToken'
+
+        /// Reads messages from all streams backwards.
+        member this.ReadAllBackwards(?fromPositionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
+            let fromPositionInclusive' =
+                defaultArg fromPositionInclusive Position.End
+
+            let maxCount' = defaultArg maxCount 1000
+
+            let prefetch' = defaultArg prefetch true
+
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+
+            readAllBackwards this fromPositionInclusive' maxCount' prefetch' cancellationToken'
+
+        /// Reads messages from a stream backwards.
+        member this.ReadStreamBackwards(streamId, ?fromVersionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
+            let fromVersionInclusive' =
+                defaultArg fromVersionInclusive StreamVersion.End
+
+            let maxCount' = defaultArg maxCount 1000
+
+            let prefetch' = defaultArg prefetch true
+
+            let cancellationToken' =
+                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
+
+
+            readStreamBackwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
+
         /// Reads messages from a stream forwards.
         member this.ReadStreamForwards(streamId, ?fromVersionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
             let fromVersionInclusive' =
@@ -199,34 +264,12 @@ module SqlStreamExtensions =
 
             readStreamForwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
 
-        /// Reads messages from a stream backwards.
-        member this.ReadStreamBackwards(streamId, ?fromVersionInclusive, ?maxCount, ?prefetch, ?cancellationToken) =
-            let fromVersionInclusive' =
-                defaultArg fromVersionInclusive StreamVersion.Start
-
-            let maxCount' = defaultArg maxCount 1000
-
-            let prefetch' = defaultArg prefetch true
-
-            let cancellationToken' =
-                defaultArg cancellationToken Unchecked.defaultof<CancellationToken>
-
-
-            readStreamBackwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
 
         /// Lists Streams in SQLStreamStore.
         /// Defaults: maxCount = 1000, continuationToken = null
-        member this.ListStreams(?maxCount: int, ?continuationToken: string) =
+        member this.ListStreams(?maxCount : int, ?continuationToken : string) =
             let maxCount' = defaultArg maxCount 1000
 
             let continuationToken' = defaultArg continuationToken null
 
             listAllStreams this maxCount' continuationToken'
-
-        /// List all the streams in the stream store.
-        /// N(streams_that_can_be_retrieved) <= Int.Max
-        /// Defaults: continuationToken = null
-        member this.ListAllStreams(?continuationToken: string) =
-            let continuationToken' = defaultArg continuationToken null
-
-            this.ListStreams(Int32.MaxValue, continuationToken')
