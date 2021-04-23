@@ -2,5 +2,3 @@
 # SqlStreamStore.FSharp
 
 A thin F# wrapper around [SQLStreamStore](https://www.nuget.org/packages/SqlStreamStore), and [SqlStreamStore.Postgres](https://www.nuget.org/packages/SqlStreamStore.Postgres).
-
-A new stable version with a completly new api is coming soon :D 
