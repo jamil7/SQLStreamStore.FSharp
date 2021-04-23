@@ -11,8 +11,8 @@ type AppendOption =
 
 module Append =
     let streamMessages'
-        (messages : NewStreamMessage list)
-        (appendOptions : AppendOption list)
+        (messages: NewStreamMessage list)
+        (appendOptions: AppendOption list)
         : Stream -> AsyncResult<AppendResult, exn> =
 
         let mutable expectedVersion = ExpectedVersion.Any
@@ -27,7 +27,7 @@ module Append =
         fun (Stream stream) ->
             stream.store.AppendToStream(stream.streamId, expectedVersion, List.toArray messages, cancellationToken)
 
-    let streamMessages (messages : NewStreamMessage list) : Stream -> AsyncResult<AppendResult, exn> =
+    let streamMessages (messages: NewStreamMessage list) : Stream -> AsyncResult<AppendResult, exn> =
         streamMessages' messages []
 
 namespace SqlStreamStore.FSharp.EventSourcing
@@ -38,8 +38,8 @@ open SqlStreamStore.Streams
 
 module Append =
     let streamEvents'
-        (events : NewStreamEvent<'event> list)
-        (appendOptions : AppendOption list)
+        (events: NewStreamEvent<'event> list)
+        (appendOptions: AppendOption list)
         : Stream -> AsyncResult<AppendResult, exn> =
 
         fun stream ->
@@ -47,5 +47,5 @@ module Append =
             |> Async.singleton
             |> AsyncResult.bind (fun messages -> Append.streamMessages' messages appendOptions stream)
 
-    let streamEvents (events : NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
+    let streamEvents (events: NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
         streamEvents' events []

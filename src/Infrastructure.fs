@@ -5,11 +5,11 @@ module Helpers =
 
     let internal eventPrefix = "Event::"
 
-    let private memoize (f : 'a -> 'b) (a : 'a) : 'b =
+    let private memoize (f: 'a -> 'b) (a: 'a) : 'b =
         let cache =
             System.Collections.Concurrent.ConcurrentDictionary<'a, Lazy<'b>>()
 
-        let getOrAdd (a : 'a) (f : 'a -> 'b) =
+        let getOrAdd (a: 'a) (f: 'a -> 'b) =
             let lazyRes =
                 cache.GetOrAdd(
                     a,
@@ -24,7 +24,7 @@ module Helpers =
 
         getOrAdd a f
 
-    let private unionToString' (a : 'a) : string =
+    let private unionToString' (a: 'a) : string =
         Reflection.FSharpValue.GetUnionFields(a, typeof<'a>)
         |> fst
         |> fun case -> case.Name
@@ -37,7 +37,7 @@ module Helpers =
 
     let internal getEventUnionCases<'a> = memoize id getEventUnionCases'<'a>
 
-    let internal protect (f : 'a -> 'b) x =
+    let internal protect (f: 'a -> 'b) x =
         try
             Ok(f x)
         with e -> Error e
@@ -49,8 +49,8 @@ module SerializationConfig =
 
     type SerializerConfig<'a> =
         {
-            encode : 'a -> Result<string, exn>
-            decode : string -> Result<'a, exn>
+            encode: 'a -> Result<string, exn>
+            decode: string -> Result<'a, exn>
         }
 
     let private opt =
@@ -69,10 +69,10 @@ module SerializationConfig =
         {
             encode =
                 protect
-                <| fun (eventData : 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
+                <| fun (eventData: 'a) -> JsonSerializer.Serialize<'a>(eventData, opt)
             decode =
                 protect
-                <| fun (data : string) -> JsonSerializer.Deserialize<'a>(data, opt)
+                <| fun (data: string) -> JsonSerializer.Deserialize<'a>(data, opt)
         }
 
 module internal JayJson =

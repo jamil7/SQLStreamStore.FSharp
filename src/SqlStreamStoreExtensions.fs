@@ -11,10 +11,10 @@ module SqlStreamExtensions =
 
     // StreamMessage extensions
 
-    let private getJsonData (streamMessage : StreamMessage) =
+    let private getJsonData (streamMessage: StreamMessage) =
         asyncResult { return! streamMessage.GetJsonData() }
 
-    let private getJsonDataAs<'a> (streamMessage : StreamMessage) =
+    let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
         asyncResult {
             let! json = getJsonData streamMessage
             return JayJson.decode<'a> json
@@ -29,26 +29,26 @@ module SqlStreamExtensions =
 
     // IStreamStore extensions
 
-    let private listAllStreams (store : IStreamStore) (maxCount : int) (continuationToken : string) =
+    let private listAllStreams (store: IStreamStore) (maxCount: int) (continuationToken: string) =
         asyncResult { return! store.ListStreams(maxCount, continuationToken) }
 
-    let private readHeadPosition (store : IStreamStore) cancellationToken =
+    let private readHeadPosition (store: IStreamStore) cancellationToken =
         asyncResult { return! store.ReadHeadPosition cancellationToken }
 
-    let private appendToStream (store : IStreamStore) streamId expectedVersion messages cancellationToken =
+    let private appendToStream (store: IStreamStore) streamId expectedVersion messages cancellationToken =
         asyncResult { return! store.AppendToStream(StreamId streamId, expectedVersion, messages, cancellationToken) }
 
-    let private deleteMessage (store : IStreamStore) streamId msgId cancellationToken =
+    let private deleteMessage (store: IStreamStore) streamId msgId cancellationToken =
         asyncResult { return! store.DeleteMessage(StreamId streamId, msgId, cancellationToken) }
 
-    let private deleteStream (store : IStreamStore) streamId version cancellationToken =
+    let private deleteStream (store: IStreamStore) streamId version cancellationToken =
         asyncResult { return! store.DeleteStream(StreamId streamId, version, cancellationToken) }
 
-    let private getStreamMetadata (store : IStreamStore) streamId cancellationToken =
+    let private getStreamMetadata (store: IStreamStore) streamId cancellationToken =
         asyncResult { return! store.GetStreamMetadata(streamId, cancellationToken) }
 
     let private readStreamForwards
-        (store : IStreamStore)
+        (store: IStreamStore)
         streamId
         fromVersionInclusive
         maxCount
@@ -67,7 +67,7 @@ module SqlStreamExtensions =
         }
 
     let private readStreamBackwards
-        (store : IStreamStore)
+        (store: IStreamStore)
         streamId
         fromVersionInclusive
         maxCount
@@ -86,7 +86,7 @@ module SqlStreamExtensions =
         }
 
     let private readAllForwards
-        (store : IStreamStore)
+        (store: IStreamStore)
         fromPositionInclusive
         maxCount
         prefetchJsonData
@@ -96,7 +96,7 @@ module SqlStreamExtensions =
             return! store.ReadAllForwards(fromPositionInclusive, maxCount, prefetchJsonData, cancellationToken) }
 
     let private readAllBackwards
-        (store : IStreamStore)
+        (store: IStreamStore)
         fromPositionInclusive
         maxCount
         prefetchJsonData
@@ -106,7 +106,7 @@ module SqlStreamExtensions =
             return! store.ReadAllBackwards(fromPositionInclusive, maxCount, prefetchJsonData, cancellationToken) }
 
     let private setStreamMetadata
-        (store : IStreamStore)
+        (store: IStreamStore)
         streamId
         expectedStreamMetadataVersion
         maxAge
@@ -165,8 +165,8 @@ module SqlStreamExtensions =
             (
                 streamId,
                 ?expectedStreamMetadataVersion,
-                ?maxAge : int,
-                ?maxCount : int,
+                ?maxAge: int,
+                ?maxCount: int,
                 ?metadataJson,
                 ?cancellationToken
             ) =
@@ -267,7 +267,7 @@ module SqlStreamExtensions =
 
         /// Lists Streams in SQLStreamStore.
         /// Defaults: maxCount = 1000, continuationToken = null
-        member this.ListStreams(?maxCount : int, ?continuationToken : string) =
+        member this.ListStreams(?maxCount: int, ?continuationToken: string) =
             let maxCount' = defaultArg maxCount 1000
 
             let continuationToken' = defaultArg continuationToken null

@@ -30,7 +30,7 @@ type ReadAllOption =
 
 module Read =
 
-    let partial' (readOptions : ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+    let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
@@ -77,7 +77,7 @@ module Read =
 
     let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
 
-    let entire' (readOptions : ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+    let entire' (readOptions: ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
@@ -116,7 +116,7 @@ module Read =
 
     let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
 
-    let allStream' (readOptions : ReadAllOption list) : IStreamStore -> AsyncResult<ReadAllPage, exn> =
+    let allStream' (readOptions: ReadAllOption list) : IStreamStore -> AsyncResult<ReadAllPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromPositionInclusive : int64 option = None

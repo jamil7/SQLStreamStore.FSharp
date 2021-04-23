@@ -5,11 +5,11 @@ open SqlStreamStore
 
 type PostgresConfig =
     {
-        host : string
-        port : string
-        username : string
-        password : string
-        database : string
+        host: string
+        port: string
+        username: string
+        password: string
+        database: string
     }
     member this.ToConnectionString(?maxPoolSize) : string =
         let maxPoolSize' = defaultArg maxPoolSize "10"
@@ -28,7 +28,7 @@ module Create =
     /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
     let inMemoryStore : unit -> InMemoryStreamStore = fun _ -> new InMemoryStreamStore()
 
-    let postgresStore (config : PostgresConfig) (schema : string option) : PostgresStreamStore =
+    let postgresStore (config: PostgresConfig) (schema: string option) : PostgresStreamStore =
 
         let storeSettings =
             let settings =
@@ -42,7 +42,7 @@ module Create =
 
         new PostgresStreamStore(storeSettings)
 
-    let schemaIfNotExists (store : PostgresStreamStore) : AsyncResult<IStreamStore, exn> =
+    let schemaIfNotExists (store: PostgresStreamStore) : AsyncResult<IStreamStore, exn> =
         asyncResult {
             do! store.CreateSchemaIfNotExists()
             return store :> IStreamStore

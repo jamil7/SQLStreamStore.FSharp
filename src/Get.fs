@@ -60,7 +60,7 @@ module Get =
         >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
 
     let eventsAndEventsData<'event> =
-        fun (page : AsyncResult<ReadStreamPage, exn>) ->
+        fun (page: AsyncResult<ReadStreamPage, exn>) ->
             asyncResult {
                 let! events' = events<'event> page
                 let! data = List.traverseAsyncResultM (fun event -> event.data) events'

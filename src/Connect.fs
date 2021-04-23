@@ -4,8 +4,8 @@ open SqlStreamStore
 
 type private StreamInternal =
     {
-        store : IStreamStore
-        streamId : string
+        store: IStreamStore
+        streamId: string
     }
 
 type Stream = private Stream of StreamInternal
@@ -13,8 +13,3 @@ type Stream = private Stream of StreamInternal
 module Connect =
     let toStream streamId store =
         Stream { streamId = streamId; store = store }
-
-
-
-
-
