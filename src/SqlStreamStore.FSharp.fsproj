@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
         <PackageId>SqlStreamStore.FSharp</PackageId>
         <Authors>Jamil Maqdis Anton</Authors>
         <PackageDescription>Thin F# wrapper around SQLStreamStore</PackageDescription>
@@ -10,22 +10,26 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>SqlStreamStore; FSharp; postgresql; cqrs; event-sourcing; event-store; stream-store</PackageTags>
     </PropertyGroup>
-
-    <ItemGroup>
-        <Compile Include="Async.fs" />
-        <Compile Include="ExceptionsHandler.fs" />
-        <Compile Include="Types.fs" />
-        <Compile Include="AppendRaw.fs" />
-        <Compile Include="ReadRaw.fs" />
-        <Compile Include="Postgres.fs" />
-        <Compile Include="Append.fs" />
-        <Compile Include="Read.fs" />
-    </ItemGroup>
-
+    
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="5.0.0" />
+        <PackageReference Include="FSharp.Prelude" Version="3.0.0" />
+        <PackageReference Include="FSharp.SystemTextJson" Version="0.16.6" />
+        <PackageReference Include="Npgsql" Version="5.0.4" />
         <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
         <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
-
+    
+    <ItemGroup>
+      <Compile Include="Infrastructure.fs" />
+      <Compile Include="SqlStreamStoreExtensions.fs" />
+      <Compile Include="StreamEvent.fs" />
+      <Compile Include="Create.fs" />
+      <Compile Include="Connect.fs" />
+      <Compile Include="Append.fs" />
+      <Compile Include="Read.fs" />
+      <Compile Include="Get.fs" />
+      <Compile Include="Subscribe.fs" />
+    </ItemGroup>
+    
 </Project>

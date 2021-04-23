@@ -1,72 +1,162 @@
 namespace SqlStreamStore.FSharp
 
+open FSharp.Prelude
+open System.Threading
+open SqlStreamStore
 open SqlStreamStore.Streams
 
+[<RequireQualifiedAccess>]
+type ReadPartialOption =
+    | CancellationToken of CancellationToken
+    | FromVersionInclusive of int
+    | MessageCount of int
+    | NoPrefetch
+    | ReadDirection of ReadDirection
+
+[<RequireQualifiedAccess>]
+type ReadEntireOption =
+    | CancellationToken of CancellationToken
+    | FromVersionInclusive of int
+    | NoPrefetch
+    | ReadDirection of ReadDirection
+
+[<RequireQualifiedAccess>]
+type ReadAllOption =
+    | CancellationToken of CancellationToken
+    | FromPositionInclusive of int64
+    | MessageCount of int
+    | NoPrefetch
+    | ReadDirection of ReadDirection
+
 module Read =
-    /// Read forwards from the all stream.
-    let allForwards (store: SqlStreamStore.IStreamStore)
-                    (startPositionInclusive: StartPosition)
-                    (msgCount: int)
-                    : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allForwards store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
 
-    /// Read backwards from the all stream.
-    let allBackwards (store: SqlStreamStore.IStreamStore)
-                     (startPositionInclusive: StartPosition)
-                     (msgCount: int)
-                     : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allBackwards store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
 
-    /// Read forwards from a specific stream.
-    let streamForwards (store: SqlStreamStore.IStreamStore)
-                       (streamName: string)
-                       (readVersion: ReadVersion)
-                       (msgCount: int)
-                       : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamForwards store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+        let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
+        let mutable fromVersionInclusive : int option = None
+        let mutable messageCount = 1000
+        let mutable prefetch = true
+        let mutable readDirection = ReadDirection.Forward
 
-    /// Read backwards from a specific stream.
-    let streamBackwards (store: SqlStreamStore.IStreamStore)
-                        (streamName: string)
-                        (readVersion: ReadVersion)
-                        (msgCount: int)
-                        : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamBackwards store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+        readOptions
+        |> List.iter
+            (function
+            | ReadPartialOption.CancellationToken token -> cancellationToken <- token
+            | ReadPartialOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
+            | ReadPartialOption.MessageCount count -> messageCount <- count
+            | ReadPartialOption.NoPrefetch -> prefetch <- false
+            | ReadPartialOption.ReadDirection direction -> readDirection <- direction)
 
-    /// Read forwards from the all stream, prefetching the messages' jsonData.
-    let allForwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                            (startPositionInclusive: StartPosition)
-                            (msgCount: int)
-                            : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allForwardsPrefetch store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+        let fromVersionInclusive' =
+            match readDirection, fromVersionInclusive with
+            | ReadDirection.Backward, None -> StreamVersion.End
+            | ReadDirection.Backward, Some index -> index
+            | ReadDirection.Forward, None -> StreamVersion.Start
+            | ReadDirection.Forward, Some index -> index
+            | _ -> failwith "Illegal ReadDirection enum."
 
-    /// Read backwards from the all stream, prefetching the messages' jsonData.
-    let allBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                             (startPositionInclusive: StartPosition)
-                             (msgCount: int)
-                             : Async<Result<ReadAllPage, exn>> =
-        ReadRaw.allBackwardsPrefetch store startPositionInclusive msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+        fun (Stream stream) ->
+            match readDirection with
+            | ReadDirection.Forward ->
+                stream.store.ReadStreamForwards(
+                    stream.streamId,
+                    fromVersionInclusive',
+                    messageCount,
+                    prefetch,
+                    cancellationToken
+                )
+            | ReadDirection.Backward ->
+                stream.store.ReadStreamBackwards(
+                    stream.streamId,
+                    fromVersionInclusive',
+                    messageCount,
+                    prefetch,
+                    cancellationToken
+                )
+            | _ -> failwith "Illegal ReadDirection enum."
 
-    /// Read forwards from a specific stream, prefetching the messages' jsonData.
-    let streamForwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                               (streamName: string)
-                               (readVersion: ReadVersion)
-                               (msgCount: int)
-                               : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamForwardsPrefetch store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
 
-    /// Read backwards from a specific stream, prefetching the messages' jsonData.
-    let streamBackwardsPrefetch (store: SqlStreamStore.IStreamStore)
-                                (streamName: string)
-                                (readVersion: ReadVersion)
-                                (msgCount: int)
-                                : Async<Result<ReadStreamPage, exn>> =
-        ReadRaw.streamBackwardsPrefetch store streamName readVersion msgCount
-        |> ExceptionsHandler.asyncExceptionHandler
+    let entire' (readOptions: ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+
+        let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
+        let mutable fromVersionInclusive : int option = None
+        let mutable prefetch = true
+        let mutable readDirection = ReadDirection.Forward
+
+        readOptions
+        |> List.iter
+            (function
+            | ReadEntireOption.CancellationToken token -> cancellationToken <- token
+            | ReadEntireOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
+            | ReadEntireOption.NoPrefetch -> prefetch <- false
+            | ReadEntireOption.ReadDirection direction -> readDirection <- direction)
+
+        let options =
+            [
+                ReadPartialOption.MessageCount System.Int32.MaxValue
+                ReadPartialOption.ReadDirection readDirection
+            ]
+
+        let options' =
+            match fromVersionInclusive, prefetch with
+            | Some version, true ->
+                [
+                    ReadPartialOption.FromVersionInclusive version
+                ]
+            | Some version, false ->
+                [
+                    ReadPartialOption.FromVersionInclusive version
+                    ReadPartialOption.NoPrefetch
+                ]
+            | None, true -> []
+            | None, false -> [ ReadPartialOption.NoPrefetch ]
+
+        partial' (options @ options')
+
+    let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
+
+    let allStream' (readOptions: ReadAllOption list) : IStreamStore -> AsyncResult<ReadAllPage, exn> =
+
+        let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
+        let mutable fromPositionInclusive : int64 option = None
+        let mutable messageCount = 1000
+        let mutable prefetch = true
+        let mutable readDirection = ReadDirection.Forward
+
+        readOptions
+        |> List.iter
+            (function
+            | ReadAllOption.CancellationToken token -> cancellationToken <- token
+            | ReadAllOption.FromPositionInclusive position -> fromPositionInclusive <- Some position
+            | ReadAllOption.MessageCount count -> messageCount <- count
+            | ReadAllOption.NoPrefetch -> prefetch <- false
+            | ReadAllOption.ReadDirection direction -> readDirection <- direction)
+
+        let fromPositionInclusive' =
+            match readDirection, fromPositionInclusive with
+            | ReadDirection.Backward, None -> Position.End
+            | ReadDirection.Backward, Some position -> position
+            | ReadDirection.Forward, None -> Position.Start
+            | ReadDirection.Forward, Some position -> position
+            | _ -> failwith "Illegal ReadDirection enum."
+
+        fun store ->
+            match readDirection with
+            | ReadDirection.Forward ->
+                store.ReadAllForwards(
+                    fromPositionInclusive = fromPositionInclusive',
+                    maxCount = messageCount,
+                    prefetch = prefetch,
+                    cancellationToken = cancellationToken
+                )
+            | ReadDirection.Backward ->
+                store.ReadAllBackwards(
+                    fromPositionInclusive = fromPositionInclusive',
+                    maxCount = messageCount,
+                    prefetch = prefetch,
+                    cancellationToken = cancellationToken
+                )
+            | _ -> failwith "Illegal ReadDirection enum."
+
+    let allStream : IStreamStore -> AsyncResult<ReadAllPage, exn> = allStream' []
