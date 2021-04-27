@@ -17,7 +17,7 @@ module SqlStreamExtensions =
     let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
         asyncResult {
             let! json = getJsonData streamMessage
-            return JayJson.decode<'a> json
+            return! JayJson.decode<'a> json
         }
 
     type StreamMessage with
