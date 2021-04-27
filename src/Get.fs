@@ -5,6 +5,7 @@ open SqlStreamStore.Streams
 
 module Get =
 
+    // A function to help wit type inference in this module
     let private curriedMap : (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
         AsyncResult.map
 
@@ -36,6 +37,33 @@ module Get =
 
     let nextStreamVersion =
         curriedMap (fun page -> page.NextStreamVersion)
+
+module GetAll =
+
+    // A function to help wit type inference in this module
+    let private curriedMap : (ReadAllPage -> 'a) -> AsyncResult<ReadAllPage, exn> -> AsyncResult<'a, exn> =
+        AsyncResult.map
+
+    let messages =
+        curriedMap (fun page -> page.Messages |> Array.toList)
+
+    let messagesData =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonData()))
+
+    let messagesDataAs<'data> =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonDataAs<'data>()))
+
+    let direction = curriedMap (fun page -> page.Direction)
+
+    let fromPosition =
+        curriedMap (fun page -> page.FromPosition)
+
+    let isEnd = curriedMap (fun page -> page.IsEnd)
+
+    let nextPosition =
+        curriedMap (fun page -> page.NextPosition)
 
 
 namespace SqlStreamStore.FSharp.EventSourcing
