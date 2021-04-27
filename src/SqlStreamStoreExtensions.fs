@@ -264,7 +264,6 @@ module SqlStreamExtensions =
 
             readStreamForwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
 
-
         /// Lists Streams in SQLStreamStore.
         /// Defaults: maxCount = 1000, continuationToken = null
         member this.ListStreams(?maxCount: int, ?continuationToken: string) =
