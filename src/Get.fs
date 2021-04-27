@@ -87,6 +87,10 @@ module Get =
         events<'event>
         >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
 
+    let eventDataAsString<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.dataAsString))
+
     let eventsAndEventsData<'event> =
         fun (page: AsyncResult<ReadStreamPage, exn>) ->
             asyncResult {
@@ -95,6 +99,28 @@ module Get =
                 return List.zip events' data
             }
 
+module GetAll =
+    let events<'event> =
+        GetAll.messages
+        >> Async.map (
+            Result.bind (
+                List.filter (fun msg -> Seq.contains msg.Type (getEventUnionCases<'event> ()))
+                >> List.traverseResultM StreamEvent.ofStreamMessage<'event>
+            )
+        )
+
+    let eventsData<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
+
     let eventDataAsString<'event> =
         events<'event>
         >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.dataAsString))
+
+    let eventsAndEventsData<'event> =
+        fun (page: AsyncResult<ReadAllPage, exn>) ->
+            asyncResult {
+                let! events' = events<'event> page
+                let! data = List.traverseAsyncResultM (fun event -> event.data) events'
+                return List.zip events' data
+            }
