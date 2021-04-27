@@ -17,7 +17,7 @@ module SqlStreamExtensions =
     let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
         asyncResult {
             let! json = getJsonData streamMessage
-            return JayJson.decode<'a> json
+            return! JayJson.decode<'a> json
         }
 
     type StreamMessage with
@@ -263,7 +263,6 @@ module SqlStreamExtensions =
 
 
             readStreamForwards this streamId fromVersionInclusive' maxCount' prefetch' cancellationToken'
-
 
         /// Lists Streams in SQLStreamStore.
         /// Defaults: maxCount = 1000, continuationToken = null

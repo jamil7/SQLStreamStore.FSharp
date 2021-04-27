@@ -5,6 +5,7 @@ open SqlStreamStore.Streams
 
 module Get =
 
+    // A function to help wit type inference in this module
     let private curriedMap : (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
         AsyncResult.map
 
@@ -37,6 +38,39 @@ module Get =
     let nextStreamVersion =
         curriedMap (fun page -> page.NextStreamVersion)
 
+    let nextStreamPage =
+        AsyncResult.bind (fun (page: ReadStreamPage) -> page.ReadNext |> AsyncResult.ofTask)
+
+module GetAll =
+
+    // A function to help wit type inference in this module
+    let private curriedMap : (ReadAllPage -> 'a) -> AsyncResult<ReadAllPage, exn> -> AsyncResult<'a, exn> =
+        AsyncResult.map
+
+    let messages =
+        curriedMap (fun page -> page.Messages |> Array.toList)
+
+    let messagesData =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonData()))
+
+    let messagesDataAs<'data> =
+        messages
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun msg -> msg.GetJsonDataAs<'data>()))
+
+    let direction = curriedMap (fun page -> page.Direction)
+
+    let fromPosition =
+        curriedMap (fun page -> page.FromPosition)
+
+    let isEnd = curriedMap (fun page -> page.IsEnd)
+
+    let nextPosition =
+        curriedMap (fun page -> page.NextPosition)
+
+    let nextAllStreamPage =
+        AsyncResult.bind (fun (page: ReadAllPage) -> page.ReadNext |> AsyncResult.ofTask)
+
 
 namespace SqlStreamStore.FSharp.EventSourcing
 
@@ -59,6 +93,10 @@ module Get =
         events<'event>
         >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
 
+    let eventDataAsString<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.dataAsString))
+
     let eventsAndEventsData<'event> =
         fun (page: AsyncResult<ReadStreamPage, exn>) ->
             asyncResult {
@@ -67,6 +105,28 @@ module Get =
                 return List.zip events' data
             }
 
+module GetAll =
+    let events<'event> =
+        GetAll.messages
+        >> Async.map (
+            Result.bind (
+                List.filter (fun msg -> Seq.contains msg.Type (getEventUnionCases<'event> ()))
+                >> List.traverseResultM StreamEvent.ofStreamMessage<'event>
+            )
+        )
+
+    let eventsData<'event> =
+        events<'event>
+        >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.data))
+
     let eventDataAsString<'event> =
         events<'event>
         >> AsyncResult.bind (List.traverseAsyncResultM (fun event -> event.dataAsString))
+
+    let eventsAndEventsData<'event> =
+        fun (page: AsyncResult<ReadAllPage, exn>) ->
+            asyncResult {
+                let! events' = events<'event> page
+                let! data = List.traverseAsyncResultM (fun event -> event.data) events'
+                return List.zip events' data
+            }
