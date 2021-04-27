@@ -38,6 +38,9 @@ module Get =
     let nextStreamVersion =
         curriedMap (fun page -> page.NextStreamVersion)
 
+    let nextStreamPage =
+        AsyncResult.bind (fun (page: ReadStreamPage) -> page.ReadNext |> AsyncResult.ofTask)
+
 module GetAll =
 
     // A function to help wit type inference in this module
@@ -64,6 +67,9 @@ module GetAll =
 
     let nextPosition =
         curriedMap (fun page -> page.NextPosition)
+
+    let nextAllStreamPage =
+        AsyncResult.bind (fun (page: ReadAllPage) -> page.ReadNext |> AsyncResult.ofTask)
 
 
 namespace SqlStreamStore.FSharp.EventSourcing
