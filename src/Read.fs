@@ -12,7 +12,7 @@ type ReadPartialOption =
     | MessageCount of int
     | NoPrefetch
     | ReadForwards
-    | ReadBackWards
+    | ReadBackwards
 
 [<RequireQualifiedAccess>]
 type ReadEntireOption =
@@ -20,7 +20,7 @@ type ReadEntireOption =
     | FromVersionInclusive of int
     | NoPrefetch
     | ReadForwards
-    | ReadBackWards
+    | ReadBackwards
 
 [<RequireQualifiedAccess>]
 type ReadAllOption =
@@ -29,7 +29,7 @@ type ReadAllOption =
     | MessageCount of int
     | NoPrefetch
     | ReadForwards
-    | ReadBackWards
+    | ReadBackwards
 
 module Read =
 
@@ -49,7 +49,7 @@ module Read =
             | ReadPartialOption.MessageCount count -> messageCount <- count
             | ReadPartialOption.NoPrefetch -> prefetch <- false
             | ReadPartialOption.ReadForwards -> readDirection <- ReadDirection.Forward
-            | ReadPartialOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
+            | ReadPartialOption.ReadBackwards -> readDirection <- ReadDirection.Backward)
 
         let fromVersionInclusive' =
             match readDirection, fromVersionInclusive with
@@ -95,7 +95,7 @@ module Read =
             | ReadEntireOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
             | ReadEntireOption.NoPrefetch -> prefetch <- false
             | ReadEntireOption.ReadForwards -> readDirection <- ReadDirection.Forward
-            | ReadEntireOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
+            | ReadEntireOption.ReadBackwards -> readDirection <- ReadDirection.Backward)
 
         let options =
             [
@@ -137,7 +137,7 @@ module Read =
             | ReadAllOption.MessageCount count -> messageCount <- count
             | ReadAllOption.NoPrefetch -> prefetch <- false
             | ReadAllOption.ReadForwards -> readDirection <- ReadDirection.Forward
-            | ReadAllOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
+            | ReadAllOption.ReadBackwards -> readDirection <- ReadDirection.Backward)
 
         let fromPositionInclusive' =
             match readDirection, fromPositionInclusive with
