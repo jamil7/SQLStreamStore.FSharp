@@ -11,14 +11,16 @@ type ReadPartialOption =
     | FromVersionInclusive of int
     | MessageCount of int
     | NoPrefetch
-    | ReadDirection of ReadDirection
+    | ReadForwards
+    | ReadBackWards
 
 [<RequireQualifiedAccess>]
 type ReadEntireOption =
     | CancellationToken of CancellationToken
     | FromVersionInclusive of int
     | NoPrefetch
-    | ReadDirection of ReadDirection
+    | ReadForwards
+    | ReadBackWards
 
 [<RequireQualifiedAccess>]
 type ReadAllOption =
@@ -26,7 +28,8 @@ type ReadAllOption =
     | FromPositionInclusive of int64
     | MessageCount of int
     | NoPrefetch
-    | ReadDirection of ReadDirection
+    | ReadForwards
+    | ReadBackWards
 
 module Read =
 
@@ -45,7 +48,8 @@ module Read =
             | ReadPartialOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
             | ReadPartialOption.MessageCount count -> messageCount <- count
             | ReadPartialOption.NoPrefetch -> prefetch <- false
-            | ReadPartialOption.ReadDirection direction -> readDirection <- direction)
+            | ReadPartialOption.ReadForwards -> readDirection <- ReadDirection.Forward
+            | ReadPartialOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
 
         let fromVersionInclusive' =
             match readDirection, fromVersionInclusive with
@@ -90,12 +94,13 @@ module Read =
             | ReadEntireOption.CancellationToken token -> cancellationToken <- token
             | ReadEntireOption.FromVersionInclusive version -> fromVersionInclusive <- Some version
             | ReadEntireOption.NoPrefetch -> prefetch <- false
-            | ReadEntireOption.ReadDirection direction -> readDirection <- direction)
+            | ReadEntireOption.ReadForwards -> readDirection <- ReadDirection.Forward
+            | ReadEntireOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
 
         let options =
             [
                 ReadPartialOption.MessageCount System.Int32.MaxValue
-                ReadPartialOption.ReadDirection readDirection
+                ReadPartialOption.ReadForwards
             ]
 
         let options' =
@@ -131,7 +136,8 @@ module Read =
             | ReadAllOption.FromPositionInclusive position -> fromPositionInclusive <- Some position
             | ReadAllOption.MessageCount count -> messageCount <- count
             | ReadAllOption.NoPrefetch -> prefetch <- false
-            | ReadAllOption.ReadDirection direction -> readDirection <- direction)
+            | ReadAllOption.ReadForwards -> readDirection <- ReadDirection.Forward
+            | ReadAllOption.ReadBackWards -> readDirection <- ReadDirection.Backward)
 
         let fromPositionInclusive' =
             match readDirection, fromPositionInclusive with
