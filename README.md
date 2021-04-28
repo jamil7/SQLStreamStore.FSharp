@@ -36,7 +36,7 @@ Use the `Create` module.
         } 
         
     // A new PostgresStore with a custom schema (use None if you want the tables to be created in public)
-    let postgresStore : PostgresStreamStore= Create.postgresStore config (Some "my-cool-schema")    
+    let postgresStore : PostgresStreamStore = Create.postgresStore config (Some "my-cool-schema")    
     
     // Cast to IStreamStore
     let store : IStreamStore = postgresStore :> IStreamStore       
@@ -87,7 +87,7 @@ the read operation.
 #### What if I want to read the stream backwards and specify if I want to prefetch the data, and all the cool stuff that already exists in SQLStreamStore?
 
 Well each of the above functions has an alternative version call that has a `'` at the end for the function's name. The
-alternative function takes a list of options as a parameters, and in those options you can do what ever you want.
+alternative function takes a list of options as a parameter.
 
 #### Why do this?
 
