@@ -11,7 +11,7 @@ and [SqlStreamStore.Postgres](https://www.nuget.org/packages/SqlStreamStore.Post
 - Has a super slim event sourcing abstraction in the form of `StreamEvent` which is a `StreamMessage` wrapper
 
 ## Usage
-This quick usage guide presumes familiarity with SQLStreamStore. A more i
+This quick usage guide presumes familiarity with SQLStreamStore. A more in-depth guide and documentation are coming soon :) 
 
 ### Creating a store
 
