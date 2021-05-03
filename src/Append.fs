@@ -29,23 +29,3 @@ module Append =
 
     let streamMessages (messages: NewStreamMessage list) : Stream -> AsyncResult<AppendResult, exn> =
         streamMessages' messages []
-
-namespace SqlStreamStore.FSharp.EventSourcing
-
-open FSharp.Prelude
-open SqlStreamStore.FSharp
-open SqlStreamStore.Streams
-
-module Append =
-    let streamEvents'
-        (events: NewStreamEvent<'event> list)
-        (appendOptions: AppendOption list)
-        : Stream -> AsyncResult<AppendResult, exn> =
-
-        fun stream ->
-            List.traverseResultM NewStreamEvent.toNewStreamMessage events
-            |> Async.singleton
-            |> AsyncResult.bind (fun messages -> Append.streamMessages' messages appendOptions stream)
-
-    let streamEvents (events: NewStreamEvent<'a> list) : Stream -> AsyncResult<AppendResult, exn> =
-        streamEvents' events []

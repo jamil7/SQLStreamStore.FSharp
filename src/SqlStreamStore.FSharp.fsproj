@@ -12,24 +12,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="5.0.0"/>
-        <PackageReference Include="FSharp.Prelude" Version="3.0.0"/>
-        <PackageReference Include="FSharp.SystemTextJson" Version="0.16.6"/>
-        <PackageReference Include="Npgsql" Version="5.0.4"/>
-        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
-        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
+        <PackageReference Update="FSharp.Core" Version="5.0.0" />
+        <PackageReference Include="FSharp.Prelude" Version="3.0.0" />
+        <PackageReference Include="FSharp.SystemTextJson" Version="0.16.6" />
+        <PackageReference Include="Npgsql" Version="5.0.4" />
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="Infrastructure.fs"/>
-        <Compile Include="SqlStreamStoreExtensions.fs"/>
-        <Compile Include="StreamEvent.fs"/>
-        <Compile Include="Create.fs"/>
-        <Compile Include="Connect.fs"/>
-        <Compile Include="Append.fs"/>
-        <Compile Include="Read.fs"/>
-        <Compile Include="Get.fs"/>
-        <Compile Include="Subscribe.fs"/>
+        <Compile Include="SqlStreamStoreExtensions.fs" />
+        <Compile Include="Create.fs" />
+        <Compile Include="Connect.fs" />
+        <Compile Include="Append.fs" />
+        <Compile Include="Read.fs" />
+        <Compile Include="Get.fs" />
+        <Compile Include="Subscribe.fs" />
     </ItemGroup>
 
 </Project>
