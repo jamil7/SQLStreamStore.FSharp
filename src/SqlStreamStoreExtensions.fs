@@ -15,10 +15,7 @@ module SqlStreamExtensions =
         asyncResult { return! streamMessage.GetJsonData() }
 
     let private getJsonDataAs<'a> (streamMessage: StreamMessage) =
-        asyncResult {
-            let! json = getJsonData streamMessage
-            return! JayJson.decode<'a> json
-        }
+        asyncResult { return! streamMessage.GetJsonDataAs<'a>() }
 
     type StreamMessage with
         /// Gets the Json Data of the message. If prefetch is enabled, this will be a fast operation.
