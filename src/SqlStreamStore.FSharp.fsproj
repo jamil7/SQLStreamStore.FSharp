@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="5.0.0" />
-        <PackageReference Include="FSharp.Prelude" Version="3.0.0" />
+        <PackageReference Include="FSharp.Prelude" Version="4.0.0" />
         <PackageReference Include="FSharp.SystemTextJson" Version="0.16.6" />
         <PackageReference Include="Npgsql" Version="5.0.4" />
         <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
