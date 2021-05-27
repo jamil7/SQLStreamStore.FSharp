@@ -48,7 +48,7 @@ jobs:
 
   build-sss-f:
     needs: check
-    if: needs.check.outputs.run_job == 'all'
+    if: needs.check.outputs.run_job == 'all' || needs.check.outputs.run_job == 'sssf'
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
