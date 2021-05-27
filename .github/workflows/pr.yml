@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 3
+          fetch-depth: 2
       - name: Run checker
         id: check_files
         run: sh ./check-files-changed.sh
