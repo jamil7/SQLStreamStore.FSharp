@@ -5,48 +5,7 @@ on:
     types: [ created, edited ]
 
 jobs:
-  check:
-    name: Check for file modification
-    outputs:
-      run_job: ${{ steps.check_files.outputs.run_job }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 2
-      - name: Run checker
-        id: check_files
-        run: |
-          echo "List modified files"
-          git diff --name-only HEAD^ HEAD
-          echo "Check paths of modified files"
-          git diff --name-only HEAD^ HEAD >files.txt
-
-          sssf=false
-          sssfp=false
-
-          while IFS= read -r file; do
-            echo $file
-            if [[ $file == src/SqlStreamStore.FSharp/* ]]; then
-              sssf=true
-            elif [[ $file == src/SqlStreamStore.FSharp.Postgres/* ]]; then
-              sssfp=true
-            fi
-          done <files.txt
-
-          rm -f files.txt
-
-          if [ $sssf = true ] && [ $sssfp = true ]; then
-            echo "::set-output name=run_jobs:all"
-          elif [ $sssf = true ] && [ $sssfp = false ]; then
-            echo "::set-output name=run_jobs:sssf"
-          elif [ $sssf = false ] && [ $sssfp = true ]; then
-            echo "::set-output name=run_jobs:sssfp"
-          else
-            echo "::set-output name=run_jobs:none"
-          fi
-
-  build-sss-f:
+  build:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
@@ -73,3 +32,15 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.SQLSTREAMSTORE_NUGET_AUTH_TOKEN }}
         run: dotnet nuget push ReleaseSSSF/*.nupkg --skip-duplicate --no-symbols true --source https://api.nuget.org/v3/index.json -k ${NUGET_AUTH_TOKEN}
+
+  publish-sss-f-postgres:
+    runs-on: ubuntu-latest
+    needs: build-sss-f-postgres
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create the package
+        run: cd src/SqlStreamStore.FSharp.Postgres; dotnet pack --configuration Release -o ReleaseSSSFP -p:PackageVersion=${GITHUB_REF/refs\/tags\/v/''} --include-source
+      - name: Publish the package to NuGet
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.SQLSTREAMSTORE_POSTGRES_NUGET_AUTH_TOKEN }}
+        run: dotnet nuget push ReleaseSSSFP/*.nupkg --skip-duplicate --no-symbols true --source https://api.nuget.org/v3/index.json -k ${NUGET_AUTH_TOKEN}
