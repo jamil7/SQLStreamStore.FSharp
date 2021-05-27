@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create the package
-        run: cd src/SqlStreamStore.FSharp; dotnet pack --configuration Release -o ReleaseSSSF -p:PackageVersion=${GITHUB_REF/refs\/tags\/v/''} --include-source
+        run: cd src/SqlStreamStore.FSharp; dotnet pack --configuration Release -o ../../ReleaseSSSF -p:PackageVersion=${GITHUB_REF/refs\/tags\/v/''} --include-source
       - name: Publish the package to NuGet
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.SQLSTREAMSTORE_NUGET_AUTH_TOKEN }}
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Create the package
-        run: cd src/SqlStreamStore.FSharp.Postgres; dotnet pack --configuration Release -o ReleaseSSSFP -p:PackageVersion=${GITHUB_REF/refs\/tags\/v/''} --include-source
+        run: cd src/SqlStreamStore.FSharp.Postgres; dotnet pack --configuration Release -o ../../ReleaseSSSFP -p:PackageVersion=${GITHUB_REF/refs\/tags\/v/''} --include-source
       - name: Publish the package to NuGet
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.SQLSTREAMSTORE_POSTGRES_NUGET_AUTH_TOKEN }}
