@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <PackageId>SqlStreamStore.FSharp.Postgres</PackageId>
+        <Authors>Jamil Maqdis Anton</Authors>
+        <PackageDescription>Thin F# wrapper around SQLStreamStore.Postgres</PackageDescription>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/jamil7/SQLStreamStore.FSharp</RepositoryUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>SqlStreamStore; FSharp; postgresql; cqrs; event-sourcing; event-store; stream-store</PackageTags>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Create.fs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SqlStreamStore.FSharp\SqlStreamStore.FSharp.fsproj"/>
+    </ItemGroup>
+
+</Project>

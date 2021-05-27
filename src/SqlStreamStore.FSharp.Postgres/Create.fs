@@ -1,4 +1,4 @@
-namespace SqlStreamStore.FSharp
+namespace SqlStreamStore.FSharp.Postgres
 
 open FSharp.Prelude
 open SqlStreamStore
