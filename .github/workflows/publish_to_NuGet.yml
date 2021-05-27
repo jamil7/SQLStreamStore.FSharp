@@ -23,7 +23,7 @@ jobs:
 
   publish-sss-f:
     runs-on: ubuntu-latest
-    needs: build-sss-f
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - name: Create the package
@@ -35,7 +35,7 @@ jobs:
 
   publish-sss-f-postgres:
     runs-on: ubuntu-latest
-    needs: build-sss-f-postgres
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - name: Create the package
