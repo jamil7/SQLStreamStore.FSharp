@@ -9,9 +9,9 @@ sssf=false
 sssfp=false
 
 while IFS= read -r file; do
-  if [[ $file == src/SqlStreamStore.FSharp/* ]]; then
+  if [[ $file == */SqlStreamStore.FSharp/* ]]; then
     sssf=true
-  elif [[ $file == src/SqlStreamStore.FSharp.Postgres/* ]]; then
+  elif [[ $file == */SqlStreamStore.FSharp.Postgres/* ]]; then
     sssfp=true
   fi
 done <files.txt
