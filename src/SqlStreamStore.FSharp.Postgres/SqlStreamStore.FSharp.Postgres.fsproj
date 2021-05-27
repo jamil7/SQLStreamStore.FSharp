@@ -10,7 +10,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SqlStreamStore.FSharp\SqlStreamStore.FSharp.fsproj" />
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
     </ItemGroup>
-    
+
+    <ItemGroup>
+        <ProjectReference Include="..\SqlStreamStore.FSharp\SqlStreamStore.FSharp.fsproj"/>
+    </ItemGroup>
+
 </Project>
