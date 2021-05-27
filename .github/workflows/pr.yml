@@ -4,7 +4,21 @@ on:
   pull_request:
 
 jobs:
-  build:
+  check:
+    name: Check for file modification
+    outputs:
+      run_job: ${{ steps.check_files.outputs.run_job }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 3
+      - name: Run checker
+        id: check_files
+        run: sh ./check-files-changed.sh
+
+  build-sss-f:
+    needs: check
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
@@ -14,6 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build
-        run: dotnet build --configuration Release
-      - name: Test
-        run: dotnet test --no-restore
+        run: cd src/SqlStreamStore.FSharp; dotnet build --configuration Release
+
+# Put back when you add tests        
+#      - name: Test
+#        run: dotnet test --no-restore
