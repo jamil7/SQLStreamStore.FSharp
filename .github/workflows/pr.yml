@@ -45,7 +45,6 @@ jobs:
             echo "::set-output name=run_jobs:none"
           fi
 
-
   build-sss-f:
     needs: check
     if: ${{ needs.check.outputs.run_job }} == 'all' || ${{ needs.check.outputs.run_job }} == 'sssf'
@@ -60,6 +59,20 @@ jobs:
       - name: Build
         run: cd src/SqlStreamStore.FSharp; dotnet build --configuration Release
 
+  build-sss-f-postgres:
+    needs: check
+    if: ${{ needs.check.outputs.run_job }} == 'all' || ${{ needs.check.outputs.run_job }} == 'sssfp'
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    name: Build on ${{ matrix.os }} using dotnet version ${{ matrix.dotnet }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build
+        run: cd src/SqlStreamStore.FSharp.Postgres; dotnet build --configuration Release
+        
 # Put back when you add tests        
 #      - name: Test
 #        run: dotnet test --no-restore
