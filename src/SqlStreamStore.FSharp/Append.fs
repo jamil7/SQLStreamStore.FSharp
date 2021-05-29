@@ -2,7 +2,7 @@ namespace SqlStreamStore.FSharp
 
 open FSharp.Prelude
 open System.Threading
-open SqlStreamStore.Streams
+open SqlStreamStore
 
 [<RequireQualifiedAccess>]
 type AppendOption =
@@ -13,9 +13,10 @@ module Append =
     let streamMessages'
         (messages: NewStreamMessage list)
         (appendOptions: AppendOption list)
-        : Stream -> AsyncResult<AppendResult, exn> =
+        (Stream stream: Stream)
+        : AsyncResult<Streams.AppendResult, exn> =
 
-        let mutable expectedVersion = ExpectedVersion.Any
+        let mutable expectedVersion = Streams.ExpectedVersion.Any
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
 
         appendOptions
@@ -24,8 +25,10 @@ module Append =
             | AppendOption.CancellationToken token -> cancellationToken <- token
             | AppendOption.ExpectedVersion version -> expectedVersion <- version)
 
-        fun (Stream stream) ->
-            stream.store.AppendToStream(stream.streamId, expectedVersion, List.toArray messages, cancellationToken)
+        let messages' =
+            List.map NewStreamMessage.toOriginalNewStreamMessage messages
 
-    let streamMessages (messages: NewStreamMessage list) : Stream -> AsyncResult<AppendResult, exn> =
+        stream.store.AppendToStream(stream.streamId, expectedVersion, List.toArray messages', cancellationToken)
+
+    let streamMessages (messages: NewStreamMessage list) : Stream -> AsyncResult<Streams.AppendResult, exn> =
         streamMessages' messages []
