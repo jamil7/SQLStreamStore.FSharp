@@ -33,7 +33,7 @@ type ReadAllOption =
 
 module Read =
 
-    let partial' (readOptions: ReadPartialOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
+    let partial' (readOptions: ReadPartialOption list) (Stream stream: Stream) : AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive : int option = None
@@ -59,25 +59,25 @@ module Read =
             | ReadDirection.Forward, Some index -> index
             | _ -> failwith "Illegal ReadDirection enum."
 
-        fun (Stream stream) ->
-            match readDirection with
-            | ReadDirection.Forward ->
-                stream.store.ReadStreamForwards(
-                    stream.streamId,
-                    fromVersionInclusive',
-                    messageCount,
-                    prefetch,
-                    cancellationToken
-                )
-            | ReadDirection.Backward ->
-                stream.store.ReadStreamBackwards(
-                    stream.streamId,
-                    fromVersionInclusive',
-                    messageCount,
-                    prefetch,
-                    cancellationToken
-                )
-            | _ -> failwith "Illegal ReadDirection enum."
+
+        match readDirection with
+        | ReadDirection.Forward ->
+            stream.store.ReadStreamForwards(
+                stream.streamId,
+                fromVersionInclusive',
+                messageCount,
+                prefetch,
+                cancellationToken
+            )
+        | ReadDirection.Backward ->
+            stream.store.ReadStreamBackwards(
+                stream.streamId,
+                fromVersionInclusive',
+                messageCount,
+                prefetch,
+                cancellationToken
+            )
+        | _ -> failwith "Illegal ReadDirection enum."
 
     let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
 
