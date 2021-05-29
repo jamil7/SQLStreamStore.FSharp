@@ -26,8 +26,9 @@ module Subscribe =
         (subscriptionName: string)
         (continueAfterVersion: int)
         (streamMessageReceived: IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: StreamSubOption list)
-        : Stream -> IStreamSubscription =
+        (streamSubOptions: StreamSubOption list)
+        (Stream stream: Stream)
+        : IStreamSubscription =
 
         let mutable hasCaughtUp = null
         let mutable maxCountPerRead = 10
@@ -43,7 +44,7 @@ module Subscribe =
 
             StreamMessageReceived subs
 
-        streamSubOption
+        streamSubOptions
         |> List.iter
             (function
             | StreamSubOption.HasCaughtUp f -> hasCaughtUp <- HasCaughtUp f
@@ -51,20 +52,19 @@ module Subscribe =
             | StreamSubOption.NoPrefetch -> prefetch <- false
             | StreamSubOption.SubscriptionDropped f -> subscriptionDropped <- SubscriptionDropped f)
 
-        fun (Stream stream) ->
-            let sub =
-                stream.store.SubscribeToStream(
-                    streamId = StreamId stream.streamId,
-                    continueAfterVersion = System.Nullable continueAfterVersion,
-                    streamMessageReceived = streamMessageReceived',
-                    subscriptionDropped = subscriptionDropped,
-                    hasCaughtUp = hasCaughtUp,
-                    prefetchJsonData = prefetch,
-                    name = subscriptionName
-                )
+        let sub =
+            stream.store.SubscribeToStream(
+                streamId = StreamId stream.streamId,
+                continueAfterVersion = System.Nullable continueAfterVersion,
+                streamMessageReceived = streamMessageReceived',
+                subscriptionDropped = subscriptionDropped,
+                hasCaughtUp = hasCaughtUp,
+                prefetchJsonData = prefetch,
+                name = subscriptionName
+            )
 
-            sub.MaxCountPerRead <- maxCountPerRead
-            sub
+        sub.MaxCountPerRead <- maxCountPerRead
+        sub
 
     let toStreamMessages
         (subscriptionName: string)
@@ -77,7 +77,7 @@ module Subscribe =
         (subscriptionName: string)
         (continueAfterPosition: int64)
         (streamMessageReceived: IAllStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
-        (streamSubOption: AllStreamSubOption list)
+        (streamSubOptions: AllStreamSubOption list)
         : IStreamStore -> IAllStreamSubscription =
 
         let mutable hasCaughtUp = null
@@ -94,7 +94,7 @@ module Subscribe =
 
             AllStreamMessageReceived subs
 
-        streamSubOption
+        streamSubOptions
         |> List.iter
             (function
             | AllStreamSubOption.HasCaughtUp f -> hasCaughtUp <- HasCaughtUp f
