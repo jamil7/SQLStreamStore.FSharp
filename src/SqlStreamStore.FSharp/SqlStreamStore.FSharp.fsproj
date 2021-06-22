@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <OutputType>Library</OutputType>
         <TargetFramework>netstandard2.0</TargetFramework>
         <PackageId>SqlStreamStore.FSharp</PackageId>
         <Authors>Jamil Maqdis Anton</Authors>
@@ -9,26 +10,26 @@
         <RepositoryUrl>https://github.com/jamil7/SQLStreamStore.FSharp</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>SqlStreamStore; FSharp; postgresql; cqrs; event-sourcing; event-store; stream-store</PackageTags>
+        <OtherFlags>$(OtherFlags) --warnon:1182</OtherFlags>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="5.0.0" />
-        <PackageReference Include="FSharp.Core" Version="5.0.0" />
-        <PackageReference Include="FSharp.Prelude" Version="4.0.3" />
-        <PackageReference Include="Npgsql" Version="5.0.4" />
-        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
+        <PackageReference Update="FSharp.Core" Version="5.0.0"/>
+        <PackageReference Include="FSharp.Core" Version="5.0.0"/>
+        <PackageReference Include="FSharp.Prelude" Version="4.0.*"/>
+        <PackageReference Include="Npgsql" Version="5.0.*"/>
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Include="Extensions.fs" />
-        <Compile Include="NewStreamMessage.fs" />
-        <Compile Include="Connect.fs" />
-        <Compile Include="Read.fs" />
-        <Compile Include="Get.fs" />
-        <Compile Include="Subscribe.fs" />
-        <Folder Include="SqlStreamStore.FSharp" />
-        <Compile Include="Append.fs" />
-        <Compile Include="Create.fs" />
+        <Compile Include="Extensions.fs"/>
+        <Compile Include="NewStreamMessage.fs"/>
+        <Compile Include="Connect.fs"/>
+        <Compile Include="Read.fs"/>
+        <Compile Include="Get.fs"/>
+        <Compile Include="Subscribe.fs"/>
+        <Compile Include="Append.fs"/>
+        <Compile Include="Create.fs"/>
     </ItemGroup>
 
 </Project>
