@@ -1,5 +1,6 @@
 namespace SqlStreamStore.FSharp
 
+[<Struct>]
 type NewStreamMessageInternal =
     {
         messageId: System.Guid option
@@ -8,6 +9,7 @@ type NewStreamMessageInternal =
         jsonMetadata: string option
     }
 
+[<Struct>]
 type NewStreamMessage = private NewStreamMessage of NewStreamMessageInternal
 
 module NewStreamMessage =
@@ -41,4 +43,3 @@ module NewStreamMessage =
         match msg.jsonMetadata with
         | Some metadata -> SqlStreamStore.Streams.NewStreamMessage(id, msg.messageType, msg.jsonData, metadata)
         | None -> SqlStreamStore.Streams.NewStreamMessage(id, msg.messageType, msg.jsonData)
-
