@@ -8,7 +8,7 @@ and [SqlStreamStore.Postgres](https://www.nuget.org/packages/SqlStreamStore.Post
 ## What does it do?
 
 - Provides a nice API to interact with SqlStreamStore from F#
-- Has a super slim event sourcing abstraction in the form of `StreamEvent` which is a `StreamMessage` wrapper
+- Wraps all functions that can throw in `Async<Result<'a, exn>>`
 
 ## Usage
 This quick usage guide presumes familiarity with SQLStreamStore. A more in-depth guide and documentation are coming soon :) 
