@@ -1,12 +1,12 @@
 namespace SqlStreamStore.FSharp
 
-open FSharp.Prelude
+open Prelude.ErrorHandling
 open SqlStreamStore.Streams
 
 module Get =
 
     // A function to help wit type inference in this module
-    let private curriedMap : (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
+    let private curriedMap: (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
         AsyncResult.map
 
     let messages =
@@ -44,7 +44,7 @@ module Get =
 module GetAll =
 
     // A function to help wit type inference in this module
-    let private curriedMap : (ReadAllPage -> 'a) -> AsyncResult<ReadAllPage, exn> -> AsyncResult<'a, exn> =
+    let private curriedMap: (ReadAllPage -> 'a) -> AsyncResult<ReadAllPage, exn> -> AsyncResult<'a, exn> =
         AsyncResult.map
 
     let messages =

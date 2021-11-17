@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp.Postgres
 
-open FSharp.Prelude
+open Prelude.ErrorHandling
 open SqlStreamStore
 
 type PostgresConfig =
