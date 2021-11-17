@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open FSharp.Prelude
+open Prelude.ErrorHandling
 open System.Threading
 open SqlStreamStore
 open SqlStreamStore.Streams
@@ -36,7 +36,7 @@ module Read =
     let partial' (readOptions: ReadPartialOption list) (Stream stream: Stream) : AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
-        let mutable fromVersionInclusive : int option = None
+        let mutable fromVersionInclusive: int option = None
         let mutable messageCount = 1000
         let mutable prefetch = true
         let mutable readDirection = ReadDirection.Forward
@@ -79,12 +79,12 @@ module Read =
             )
         | _ -> failwith "Illegal ReadDirection enum."
 
-    let partial : Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
+    let partial: Stream -> AsyncResult<ReadStreamPage, exn> = partial' []
 
     let entire' (readOptions: ReadEntireOption list) : Stream -> AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
-        let mutable fromVersionInclusive : int option = None
+        let mutable fromVersionInclusive: int option = None
         let mutable prefetch = true
         let mutable readDirection = ReadDirection.Forward
 
@@ -119,12 +119,12 @@ module Read =
 
         partial' (options @ options')
 
-    let entire : Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
+    let entire: Stream -> AsyncResult<ReadStreamPage, exn> = entire' []
 
     let allStream' (readOptions: ReadAllOption list) : IStreamStore -> AsyncResult<ReadAllPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
-        let mutable fromPositionInclusive : int64 option = None
+        let mutable fromPositionInclusive: int64 option = None
         let mutable messageCount = 1000
         let mutable prefetch = true
         let mutable readDirection = ReadDirection.Forward
@@ -165,4 +165,4 @@ module Read =
                 )
             | _ -> failwith "Illegal ReadDirection enum."
 
-    let allStream : IStreamStore -> AsyncResult<ReadAllPage, exn> = allStream' []
+    let allStream: IStreamStore -> AsyncResult<ReadAllPage, exn> = allStream' []

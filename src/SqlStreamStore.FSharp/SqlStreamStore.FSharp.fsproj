@@ -14,14 +14,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="5.0.0"/>
-        <PackageReference Include="FSharp.Core" Version="5.0.0"/>
-        <PackageReference Include="FSharp.Prelude" Version="4.0.*"/>
-        <PackageReference Include="Npgsql" Version="5.0.*"/>
-        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Compile Include="Extensions.fs"/>
         <Compile Include="NewStreamMessage.fs"/>
         <Compile Include="Connect.fs"/>
@@ -30,6 +22,14 @@
         <Compile Include="Subscribe.fs"/>
         <Compile Include="Append.fs"/>
         <Compile Include="Create.fs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="FSharp.Core" Version="6.0.*"/>
+        <PackageReference Include="FSharp.Core" Version="6.0.*"/>
+        <PackageReference Include="FSharp.Prelude" Version="5.0.*"/>
+        <PackageReference Include="Npgsql" Version="5.0.*"/>
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
     </ItemGroup>
 
 </Project>

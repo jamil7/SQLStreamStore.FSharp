@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open FSharp.Prelude
+open Prelude.ErrorHandling
 open SqlStreamStore
 open SqlStreamStore.Streams
 open SqlStreamStore.Subscriptions
@@ -36,7 +36,7 @@ module Subscribe =
         let mutable subscriptionDropped = null
 
         let streamMessageReceived' =
-            let subs : IStreamSubscription -> StreamMessage -> CancellationToken -> Task =
+            let subs: IStreamSubscription -> StreamMessage -> CancellationToken -> Task =
                 fun iStreamSubscription msg cancellationToken ->
                     streamMessageReceived iStreamSubscription msg cancellationToken
                     |> Async.StartImmediateAsTask
@@ -86,7 +86,7 @@ module Subscribe =
         let mutable subscriptionDropped = null
 
         let streamMessageReceived' =
-            let subs : IAllStreamSubscription -> StreamMessage -> CancellationToken -> Task =
+            let subs: IAllStreamSubscription -> StreamMessage -> CancellationToken -> Task =
                 fun iAllStreamSubscription msg cancellationToken ->
                     streamMessageReceived iAllStreamSubscription msg cancellationToken
                     |> Async.StartImmediateAsTask
