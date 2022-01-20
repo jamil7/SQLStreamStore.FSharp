@@ -1,40 +1,34 @@
 namespace SqlStreamStore.FSharp
 
 [<Struct>]
-type NewStreamMessageInternal =
-    {
-        messageId: System.Guid option
-        messageType: string
-        jsonData: string
-        jsonMetadata: string option
-    }
-
-[<Struct>]
-type NewStreamMessage = private NewStreamMessage of NewStreamMessageInternal
+type NewStreamMessage =
+    private
+        {
+            messageId: System.Guid option
+            messageType: string
+            jsonData: string
+            jsonMetadata: string option
+        }
 
 module NewStreamMessage =
 
     let create (messageType: string) (jsonData: string) : NewStreamMessage =
-        NewStreamMessage
-            {
-                messageId = None
-                messageType = messageType
-                jsonData = jsonData
-                jsonMetadata = None
-            }
+        {
+            messageId = None
+            messageType = messageType
+            jsonData = jsonData
+            jsonMetadata = None
+        }
 
-    let withMessageId (messageId: System.Guid) (NewStreamMessage msg: NewStreamMessage) : NewStreamMessage =
-        NewStreamMessage { msg with messageId = Some messageId }
+    let withMessageId (messageId: System.Guid) (msg: NewStreamMessage) : NewStreamMessage =
+        { msg with messageId = Some messageId }
 
-    let withJsonMetadata (jsonMetadata: string) (NewStreamMessage msg: NewStreamMessage) : NewStreamMessage =
-        NewStreamMessage
-            { msg with
-                jsonMetadata = Some jsonMetadata
-            }
+    let withJsonMetadata (jsonMetadata: string) (msg: NewStreamMessage) : NewStreamMessage =
+        { msg with
+            jsonMetadata = Some jsonMetadata
+        }
 
-    let internal toOriginalNewStreamMessage
-        (NewStreamMessage msg: NewStreamMessage)
-        : SqlStreamStore.Streams.NewStreamMessage =
+    let internal toOriginalNewStreamMessage (msg: NewStreamMessage) : SqlStreamStore.Streams.NewStreamMessage =
         let id =
             match msg.messageId with
             | Some id -> id
