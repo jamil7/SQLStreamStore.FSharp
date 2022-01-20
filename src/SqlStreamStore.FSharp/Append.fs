@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open System.Threading
 open SqlStreamStore
 

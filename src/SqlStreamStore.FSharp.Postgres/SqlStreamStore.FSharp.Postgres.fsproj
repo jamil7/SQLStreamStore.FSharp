@@ -12,17 +12,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Create.fs"/>
+        <Compile Include="Create.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="6.0.*"/>
-        <PackageReference Include="FSharp.Core" Version="6.0.*"/>
-        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8"/>
+        <PackageReference Update="FSharp.Core" Version="6.0.*" />
+        <PackageReference Include="FSharp.Core" Version="6.0.*" />
+        <PackageReference Include="FSharp.Prelude" Version="6.0.0-beta-3" />
+        <PackageReference Include="SqlStreamStore.Postgres" Version="1.2.0-beta.8" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SqlStreamStore.FSharp\SqlStreamStore.FSharp.fsproj"/>
+        <ProjectReference Include="..\SqlStreamStore.FSharp\SqlStreamStore.FSharp.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open SqlStreamStore.Streams
 
 module Get =
@@ -14,11 +14,11 @@ module Get =
 
     let messagesData =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonData()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonData()))
 
     let messagesDataAs<'data> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonDataAs<'data>()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonDataAs<'data>()))
 
     let status = curriedMap (fun page -> page.Status)
 
@@ -52,11 +52,11 @@ module GetAll =
 
     let messagesData =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonData()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonData()))
 
     let messagesDataAs<'data> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonDataAs<'data>()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonDataAs<'data>()))
 
     let direction = curriedMap (fun page -> page.Direction)
 
