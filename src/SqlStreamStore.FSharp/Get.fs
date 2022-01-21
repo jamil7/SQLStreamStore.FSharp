@@ -1,72 +1,67 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open SqlStreamStore.Streams
 
 module Get =
 
-    // A function to help wit type inference in this module
-    let private curriedMap: (ReadStreamPage -> 'a) -> AsyncResult<ReadStreamPage, exn> -> AsyncResult<'a, exn> =
-        AsyncResult.map
+    let messages: AsyncResult<ReadStreamPage, exn> -> AsyncResult<StreamMessage list, exn> =
+        AsyncResult.map (fun page -> page.Messages |> Array.toList)
 
-    let messages =
-        curriedMap (fun page -> page.Messages |> Array.toList)
-
-    let messagesData =
+    let messagesData: AsyncResult<ReadStreamPage, exn> -> AsyncResult<string list, exn> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonData()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonData()))
 
-    let messagesDataAs<'data> =
+    let messagesDataAs<'data> : AsyncResult<ReadStreamPage, exn> -> AsyncResult<'data list, exn> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonDataAs<'data>()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonDataAs<'data>()))
 
-    let status = curriedMap (fun page -> page.Status)
+    let status: AsyncResult<ReadStreamPage, exn> -> AsyncResult<PageReadStatus, exn> =
+        AsyncResult.map (fun page -> page.Status)
 
-    let isEnd = curriedMap (fun page -> page.IsEnd)
+    let isEnd: AsyncResult<ReadStreamPage, exn> -> AsyncResult<bool, exn> = AsyncResult.map (fun page -> page.IsEnd)
 
-    let readDirection =
-        curriedMap (fun page -> page.ReadDirection)
+    let readDirection: AsyncResult<ReadStreamPage, exn> -> AsyncResult<ReadDirection, exn> =
+        AsyncResult.map (fun page -> page.ReadDirection)
 
-    let streamId = curriedMap (fun page -> page.StreamId)
+    let streamId: AsyncResult<ReadStreamPage, exn> -> AsyncResult<string, exn> =
+        AsyncResult.map (fun page -> page.StreamId)
 
-    let fromStreamVersion =
-        curriedMap (fun page -> page.FromStreamVersion)
+    let fromStreamVersion: AsyncResult<ReadStreamPage, exn> -> AsyncResult<int, exn> =
+        AsyncResult.map (fun page -> page.FromStreamVersion)
 
-    let lastStreamPosition =
-        curriedMap (fun page -> page.LastStreamPosition)
+    let lastStreamPosition: AsyncResult<ReadStreamPage, exn> -> AsyncResult<int64, exn> =
+        AsyncResult.map (fun page -> page.LastStreamPosition)
 
-    let nextStreamVersion =
-        curriedMap (fun page -> page.NextStreamVersion)
+    let nextStreamVersion: AsyncResult<ReadStreamPage, exn> -> AsyncResult<int, exn> =
+        AsyncResult.map (fun page -> page.NextStreamVersion)
 
-    let nextStreamPage =
+    let nextStreamPage: AsyncResult<ReadStreamPage, exn> -> AsyncResult<ReadStreamPage, exn> =
         AsyncResult.bind (fun (page: ReadStreamPage) -> page.ReadNext |> AsyncResult.ofTask)
 
 module GetAll =
 
-    // A function to help wit type inference in this module
-    let private curriedMap: (ReadAllPage -> 'a) -> AsyncResult<ReadAllPage, exn> -> AsyncResult<'a, exn> =
-        AsyncResult.map
+    let messages: AsyncResult<ReadAllPage, exn> -> AsyncResult<StreamMessage list, exn> =
+        AsyncResult.map (fun page -> page.Messages |> Array.toList)
 
-    let messages =
-        curriedMap (fun page -> page.Messages |> Array.toList)
-
-    let messagesData =
+    let messagesData: AsyncResult<ReadAllPage, exn> -> AsyncResult<string list, exn> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonData()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonData()))
 
-    let messagesDataAs<'data> =
+    let messagesDataAs<'data> : AsyncResult<ReadAllPage, exn> -> AsyncResult<'data list, exn> =
         messages
-        >> AsyncResult.bind (AsyncResult.mapM (fun msg -> msg.GetJsonDataAs<'data>()))
+        >> AsyncResult.bind (AsyncResult.traverse (fun msg -> msg.GetJsonDataAs<'data>()))
 
-    let direction = curriedMap (fun page -> page.Direction)
+    let direction: AsyncResult<ReadAllPage, exn> -> AsyncResult<ReadDirection, exn> =
+        AsyncResult.map (fun page -> page.Direction)
 
-    let fromPosition =
-        curriedMap (fun page -> page.FromPosition)
+    let fromPosition: AsyncResult<ReadAllPage, exn> -> AsyncResult<int64, exn> =
+        AsyncResult.map (fun page -> page.FromPosition)
 
-    let isEnd = curriedMap (fun page -> page.IsEnd)
+    let isEnd: AsyncResult<ReadAllPage, exn> -> AsyncResult<bool, exn> = AsyncResult.map (fun page -> page.IsEnd)
 
-    let nextPosition =
-        curriedMap (fun page -> page.NextPosition)
+    let nextPosition: AsyncResult<ReadAllPage, exn> -> AsyncResult<int64, exn> =
+        AsyncResult.map (fun page -> page.NextPosition)
 
-    let nextAllStreamPage =
+    let nextAllStreamPage: AsyncResult<ReadAllPage, exn> -> AsyncResult<ReadAllPage, exn> =
         AsyncResult.bind (fun (page: ReadAllPage) -> page.ReadNext |> AsyncResult.ofTask)
