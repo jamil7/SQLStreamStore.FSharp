@@ -14,22 +14,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Extensions.fs"/>
-        <Compile Include="NewStreamMessage.fs"/>
-        <Compile Include="Connect.fs"/>
-        <Compile Include="Read.fs"/>
-        <Compile Include="Get.fs"/>
-        <Compile Include="Subscribe.fs"/>
-        <Compile Include="Append.fs"/>
-        <Compile Include="Create.fs"/>
+        <Compile Include="Extensions.fs" />
+        <Compile Include="NewStreamMessage.fs" />
+        <Compile Include="Connect.fs" />
+        <Compile Include="Read.fs" />
+        <Compile Include="Get.fs" />
+        <Compile Include="Subscribe.fs" />
+        <Compile Include="Append.fs" />
+        <Compile Include="Create.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="6.0.*"/>
-        <PackageReference Include="FSharp.Core" Version="6.0.*"/>
-        <PackageReference Include="FSharp.Prelude" Version="5.0.*"/>
-        <PackageReference Include="Npgsql" Version="5.0.*"/>
-        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8"/>
+        <PackageReference Update="FSharp.Core" Version="6.0.*" />
+        <PackageReference Include="FSharp.Core" Version="6.0.*" />
+        <PackageReference Include="FSharp.Prelude" Version="6.0.0-beta-3" />
+        <PackageReference Include="Npgsql" Version="5.0.*" />
+        <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
     </ItemGroup>
 
 </Project>

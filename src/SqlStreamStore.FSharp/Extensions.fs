@@ -1,10 +1,9 @@
 namespace SqlStreamStore.FSharp
 
 open System.Threading
-open Prelude.ErrorHandling
+open Prelude
 open SqlStreamStore
 open SqlStreamStore.Streams
-open System
 
 [<AutoOpen>]
 module SqlStreamExtensions =
@@ -172,13 +171,13 @@ module SqlStreamExtensions =
 
             let maxAge' =
                 match maxAge with
-                | None -> Nullable()
-                | Some age -> Nullable age
+                | None -> System.Nullable()
+                | Some age -> System.Nullable age
 
             let maxCount' =
                 match maxCount with
-                | None -> Nullable()
-                | Some count -> Nullable count
+                | None -> System.Nullable()
+                | Some count -> System.Nullable count
 
             let metadataJson' = defaultArg metadataJson null
 
