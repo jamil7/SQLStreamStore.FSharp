@@ -26,7 +26,6 @@
 
     <ItemGroup>
         <PackageReference Include="FSharp.Prelude" Version="6.0.0-beta-3" />
-        <PackageReference Include="Npgsql" Version="5.0.*" />
         <PackageReference Include="SqlStreamStore" Version="1.2.0-beta.8" />
     </ItemGroup>
 
