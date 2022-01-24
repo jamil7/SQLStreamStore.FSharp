@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open System.Threading
 open SqlStreamStore
 open SqlStreamStore.Streams
@@ -33,7 +33,7 @@ type ReadAllOption =
 
 module Read =
 
-    let partial' (readOptions: ReadPartialOption list) (Stream stream: Stream) : AsyncResult<ReadStreamPage, exn> =
+    let partial' (readOptions: ReadPartialOption list) (stream: Stream) : AsyncResult<ReadStreamPage, exn> =
 
         let mutable cancellationToken = Unchecked.defaultof<CancellationToken>
         let mutable fromVersionInclusive: int option = None

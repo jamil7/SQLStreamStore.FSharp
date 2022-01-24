@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp.Postgres
 
-open Prelude.ErrorHandling
+open Prelude
 open SqlStreamStore
 
 type PostgresConfig =
@@ -24,9 +24,6 @@ type PostgresConfig =
             maxPoolSize'
 
 module Create =
-
-    /// Represents an in-memory implementation of a stream store. Use for testing or high/speed + volatile scenarios.
-    let inMemoryStore : unit -> InMemoryStreamStore = fun _ -> new InMemoryStreamStore()
 
     let postgresStore (config: PostgresConfig) (schema: string option) : PostgresStreamStore =
 

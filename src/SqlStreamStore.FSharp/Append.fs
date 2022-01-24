@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open System.Threading
 open SqlStreamStore
 
@@ -13,7 +13,7 @@ module Append =
     let streamMessages'
         (messages: NewStreamMessage list)
         (appendOptions: AppendOption list)
-        (Stream stream: Stream)
+        (stream: Stream)
         : AsyncResult<Streams.AppendResult, exn> =
 
         let mutable expectedVersion = Streams.ExpectedVersion.Any

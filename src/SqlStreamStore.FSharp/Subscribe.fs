@@ -1,6 +1,6 @@
 namespace SqlStreamStore.FSharp
 
-open Prelude.ErrorHandling
+open Prelude
 open SqlStreamStore
 open SqlStreamStore.Streams
 open SqlStreamStore.Subscriptions
@@ -27,7 +27,7 @@ module Subscribe =
         (continueAfterVersion: int)
         (streamMessageReceived: IStreamSubscription -> StreamMessage -> CancellationToken -> AsyncResult<_, _>)
         (streamSubOptions: StreamSubOption list)
-        (Stream stream: Stream)
+        (stream: Stream)
         : IStreamSubscription =
 
         let mutable hasCaughtUp = null
